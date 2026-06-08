@@ -1,22 +1,57 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useSession } from "next-auth/react";
 
 interface AdPlaceholderProps {
   position: "header" | "sidebar" | "in-article" | "footer";
   className?: string;
+  adSlot?: string; // Optional Google AdSense Slot ID
 }
 
-export default function AdPlaceholder({ position, className = "" }: AdPlaceholderProps) {
+export default function AdPlaceholder({ position, className = "", adSlot }: AdPlaceholderProps) {
   const { data: session } = useSession();
   
   const isPremium = (session?.user as any)?.subscription?.plan === "premium" && 
                     (session?.user as any)?.subscription?.status === "active";
 
+  useEffect(() => {
+    // Dynamically push the ad once the Google AdSense script has loaded in client side
+    if (!isPremium && adSlot && typeof window !== "undefined") {
+      try {
+        ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
+      } catch (err) {
+        console.warn("AdSense push warning (usually fails in local sandbox without ad blocker scripts):", err);
+      }
+    }
+  }, [isPremium, adSlot]);
+
   if (isPremium) {
     // Hide ads completely for premium members
     return null;
+  }
+
+  // If a real ad slot ID is provided, render the real Google AdSense HTML unit
+  if (adSlot) {
+    const slotDimensions = {
+      header: { width: "100%", height: "90px" },
+      sidebar: { width: "300px", height: "250px" },
+      "in-article": { width: "100%", height: "280px" },
+      footer: { width: "100%", height: "90px" },
+    };
+
+    return (
+      <div className={`mx-auto flex justify-center items-center my-4 overflow-hidden ${className}`}>
+        <ins
+          className="adsbygoogle"
+          style={{ display: "block", ...slotDimensions[position] }}
+          data-ad-client={process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID || "ca-pub-9246300055713570"}
+          data-ad-slot={adSlot}
+          data-ad-format={position === "in-article" ? "fluid" : "auto"}
+          data-full-width-responsive="true"
+        />
+      </div>
+    );
   }
 
   const dimensions = {

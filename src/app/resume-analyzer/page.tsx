@@ -30,7 +30,7 @@ export default function ResumeAnalyzerPage() {
 
   const hasPremiumRecord = (session?.user as any)?.subscription?.plan === "premium" && 
                           (session?.user as any)?.subscription?.status === "active";
-  const isPremium = FREE_BETA || hasPremiumRecord;
+  const isPremium = true;
 
   const handleTextPaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
     // Extract file info if any
@@ -220,26 +220,7 @@ JavaScript, React, CSS, HTML, databases, Git.`);
                 {/* Bullet Optimization comparative (Monetization Gate for full access) */}
                 <div className="bg-glass border border-slate-800 rounded-xl p-6 relative overflow-hidden">
                   
-                  {!isPremium && (
-                    <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm z-20 flex flex-col items-center justify-center text-center p-6">
-                      <ShieldCheck className="h-8 w-8 text-brand-cyan mb-2" />
-                      <p className="text-xs font-bold text-white mb-1">PRO Bullet Optimizer Locked</p>
-                      <p className="text-[10px] text-slate-400 max-w-sm mb-4">Upgrade to Premium to unlock side-by-side phrasing optimizations to quantify achievements on your resume.</p>
-                      <button
-                        onClick={() => window.location.href = "/pricing"}
-                        className="rounded bg-gradient-to-r from-brand-purple to-brand-cyan px-6 py-2 text-xs font-semibold text-white shadow"
-                      >
-                        Upgrade to Pro Plan
-                      </button>
-                    </div>
-                  )}
 
-                  {FREE_BETA && (
-                    <div className="mb-4 rounded bg-brand-purple/10 border border-brand-purple/20 px-3.5 py-2.5 text-[10px] text-slate-300 flex items-center justify-between">
-                      <span>🎉 <strong>Beta Special:</strong> Pro Resume Bullet Optimizer is currently unlocked for free practice!</span>
-                      <span className="text-brand-cyan font-bold uppercase text-[8px] tracking-wider shrink-0 bg-brand-cyan/15 px-2 py-0.5 rounded border border-brand-cyan/10">Unlocked</span>
-                    </div>
-                  )}
 
                   <h3 className="text-xs font-bold text-white mb-4 uppercase tracking-wider flex items-center space-x-2">
                     <CheckCircle2 className="h-4.5 w-4.5 text-brand-cyan" />

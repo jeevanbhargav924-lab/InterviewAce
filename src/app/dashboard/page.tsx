@@ -171,25 +171,16 @@ function UserDashboardContent() {
           {/* Membership widget */}
           <div className="bg-glass border border-slate-800 rounded-xl p-5 flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="h-10 w-10 rounded bg-amber-500/10 flex items-center justify-center shrink-0 border border-amber-500/20">
-                <Crown className="h-5 w-5 text-amber-500" />
+              <div className="h-10 w-10 rounded bg-brand-cyan/10 flex items-center justify-center shrink-0 border border-brand-cyan/20">
+                <Crown className="h-5 w-5 text-brand-cyan" />
               </div>
               <div>
-                <p className="text-[10px] text-slate-500 font-semibold uppercase">Billing Plan Tier</p>
+                <p className="text-[10px] text-slate-500 font-semibold uppercase">Account Access</p>
                 <h3 className="text-xs font-bold text-white mt-0.5">
-                  {FREE_BETA ? "Beta Launch Access (Free)" : hasPremiumRecord ? "Pro Premium Account" : "Free Starter Plan"}
+                  Free Trial (3 Months Active)
                 </h3>
               </div>
             </div>
-            {!FREE_BETA && !hasPremiumRecord && (
-              <button
-                onClick={handleUpgrade}
-                disabled={billingLoading}
-                className="rounded bg-gradient-to-r from-brand-purple to-brand-cyan hover:brightness-110 px-3.5 py-1.5 text-[9px] font-bold text-white"
-              >
-                {billingLoading ? "Loading..." : "Upgrade"}
-              </button>
-            )}
           </div>
 
         </div>

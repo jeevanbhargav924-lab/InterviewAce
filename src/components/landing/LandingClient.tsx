@@ -96,19 +96,20 @@ export default function LandingClient({ initialBlogs }: LandingClientProps) {
   };
 
   const categories = [
-    { name: "React", count: "45+ Questions", slug: "React", desc: "Hooks, reconciliation, state architecture, fiber.", color: "from-blue-500/20 to-indigo-500/20 text-blue-400" },
-    { name: "JavaScript", count: "60+ Questions", slug: "JavaScript", desc: "Closures, event loop, promises, prototype engine.", color: "from-amber-500/20 to-orange-500/20 text-amber-400" },
-    { name: "TypeScript", count: "35+ Questions", slug: "TypeScript", desc: "Generics, union models, configuration, type safety.", color: "from-indigo-500/20 to-sky-500/20 text-indigo-400" },
-    { name: "Next.js", count: "30+ Questions", slug: "Next.js", desc: "SSR, static generation, app directory, caching.", color: "from-slate-500/20 to-zinc-500/20 text-slate-300" },
-    { name: "Node.js", count: "40+ Questions", slug: "Node.js", desc: "Streams, event loops, clustering, middlewares.", color: "from-emerald-500/20 to-green-500/20 text-emerald-400" },
-    { name: "HR & Behavioral", count: "50+ Questions", slug: "HR", desc: "STAR method, leadership queries, salary chats.", color: "from-rose-500/20 to-pink-500/20 text-rose-400" },
+    { name: "React", count: "120+ Questions", slug: "react", desc: "Hooks, fiber engine, reconciliation, state patterns." },
+    { name: "React Native", count: "85+ Questions", slug: "react-native", desc: "Bridges, Fabric UI engine, layout offsets, JSI execution." },
+    { name: "JavaScript", count: "150+ Questions", slug: "javascript", desc: "Prototypes, closures, scope chains, event loops." },
+    { name: "TypeScript", count: "95+ Questions", slug: "typescript", desc: "Generics, declaration merging, strict validation rules." },
+    { name: "Next.js", count: "75+ Questions", slug: "nextjs", desc: "App router routing, SSR caching, Static params, schemas." },
+    { name: "Node.js", count: "110+ Questions", slug: "nodejs", desc: "Thread pools, non-blocking I/O event loops, stream feeds." },
+    { name: "HR Interview", count: "60+ Questions", slug: "hr-interview", desc: "STAR behavioral answers, salary negotiations, leadership." }
   ];
 
   const faqs = [
     { q: "How does the AI Mock Interview system grade my answers?", a: "Our AI evaluates your verbal transcripts or typed replies across three specific core vectors: Technical accuracy (matching engineering specifications), Communication skill (articulating architecture designs concisely), and Confidence (speech pace, placeholder word metrics)." },
-    { q: "Can I use the resume analyzer for multiple job descriptions?", a: "Yes! The premium dashboard allows you to paste the specific job description alongside your resume upload. Our ATS parser matches details and recommends exact keywords to add to maximize your callback rate." },
+    { q: "Can I use the resume analyzer for multiple job descriptions?", a: "Yes! The dashboard allows you to paste the specific job description alongside your resume upload. Our ATS parser matches details and recommends exact keywords to add to maximize your callback rate." },
     { q: "Do you support standard DSA compiler evaluations?", a: "Yes. Our Coding Challenges page features a robust Monaco editor and sandboxed runtime engine that executes code against hidden test suites, providing real-time runtime pass/fail logs." },
-    { q: "Is Stripe billing secure for plan upgrades?", a: "Absolutely. All transactions are handled directly through secure Stripe Checkout pages. We do not store or process your card numbers on our servers." }
+    { q: "How does the free trial work?", a: "We are currently offering a 3-month free trial for all new accounts. You get unlimited access to mock interviews, coding sandboxes, and ATS resume scoring without needing a credit card." }
   ];
 
   return (
@@ -157,6 +158,26 @@ export default function LandingClient({ initialBlogs }: LandingClientProps) {
               <Play className="h-4 w-4" />
             </Link>
           </div>
+
+          {/* Stats Section */}
+          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto border border-slate-800/80 bg-slate-955/40 rounded-2xl p-6 backdrop-blur-md relative overflow-hidden">
+            <div className="text-center space-y-1">
+              <p className="text-2xl font-black text-white bg-gradient-to-r from-brand-purple to-brand-cyan bg-clip-text text-transparent">1,000+</p>
+              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Interview Questions</p>
+            </div>
+            <div className="text-center space-y-1 border-l border-slate-800/50">
+              <p className="text-2xl font-black text-white bg-gradient-to-r from-brand-purple to-brand-cyan bg-clip-text text-transparent">200+</p>
+              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Technical Articles</p>
+            </div>
+            <div className="text-center space-y-1 border-l border-slate-800/50">
+              <p className="text-2xl font-black text-white bg-gradient-to-r from-brand-purple to-brand-cyan bg-clip-text text-transparent">50+</p>
+              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Learning Paths</p>
+            </div>
+            <div className="text-center space-y-1 border-l border-slate-800/50">
+              <p className="text-2xl font-black text-white bg-gradient-to-r from-brand-purple to-brand-cyan bg-clip-text text-transparent">15K+</p>
+              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Simulations Done</p>
+            </div>
+          </div>
         </motion.div>
       </section>
 
@@ -183,7 +204,7 @@ export default function LandingClient({ initialBlogs }: LandingClientProps) {
             Everything you need in one powerful ecosystem
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-slate-400 text-sm">
-            Stop juggling multiple subscriptions. Master programming interviews, optimize resumes, and run code sandbox workflows.
+            Stop juggling multiple prep tools. Master programming interviews, optimize resumes, and run code sandbox workflows.
           </p>
         </div>
 
@@ -240,8 +261,8 @@ export default function LandingClient({ initialBlogs }: LandingClientProps) {
             {categories.map((cat, idx) => (
               <Link
                 key={idx}
-                href={`/prepare?category=${cat.slug}`}
-                className="bg-glass rounded-lg p-5 border border-slate-800 hover:border-brand-cyan/30 flex flex-col justify-between hover:bg-slate-900/40 transition-all duration-200"
+                href={`/questions/${cat.slug}`}
+                className="bg-glass rounded-lg p-5 border border-slate-800 hover:border-brand-cyan/30 flex flex-col justify-between hover:bg-slate-900/40 transition-all duration-200 text-left"
               >
                 <div>
                   <div className="flex justify-between items-center mb-3">
@@ -254,6 +275,110 @@ export default function LandingClient({ initialBlogs }: LandingClientProps) {
                   <span>Start Practice</span>
                   <ArrowRight className="h-3 w-3" />
                 </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 4b. Featured Learning Paths */}
+      <section className="py-16 border-t border-slate-900 bg-[#030014] relative z-10 text-left">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-2xl font-bold text-white sm:text-3xl">Featured Learning Paths</h2>
+            <p className="text-slate-400 text-xs mt-2">Structured engineering curriculum to scale from junior engineer to systems architect.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                title: "Frontend Architect Path",
+                desc: "Master layout performance, state design patterns, components compilation, interfaces design, and SEO audits.",
+                techs: ["HTML", "CSS", "JavaScript", "React", "TypeScript", "Next.js"],
+                color: "from-brand-purple/20 to-brand-cyan/20 border-brand-purple/30"
+              },
+              {
+                title: "Backend Scalability Path",
+                desc: "Learn express logic, single-threaded event loops concurrency, cluster sharding, caching, and clean scaling models.",
+                techs: ["JavaScript", "TypeScript", "Node.js", "Express", "MongoDB", "Redis"],
+                color: "from-brand-cyan/20 to-brand-purple/20 border-brand-cyan/30"
+              },
+              {
+                title: "Mobile Dev Architect Path",
+                desc: "Deep dive into React Native bridge modules, thread execution models, synchronization channels, and local caches.",
+                techs: ["React", "TypeScript", "React Native", "Fabric", "JSI", "Native Bridges"],
+                color: "from-brand-purple/20 to-brand-cyan/20 border-brand-purple/30"
+              }
+            ].map((path, idx) => (
+              <div
+                key={idx}
+                className={`bg-glass rounded-2xl p-6 border ${path.color} flex flex-col justify-between hover:scale-[1.01] transition-all`}
+              >
+                <div>
+                  <h3 className="text-sm font-bold text-white mb-2">{path.title}</h3>
+                  <p className="text-slate-400 text-[11px] leading-relaxed mb-4">{path.desc}</p>
+                </div>
+                <div className="flex flex-wrap gap-1.5 pt-3 border-t border-slate-800/40">
+                  {path.techs.map((tech) => (
+                    <span key={tech} className="text-[8px] text-slate-500 bg-slate-900 border border-slate-850 px-2 py-0.5 rounded">
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 4c. Latest & Trending Interview Questions */}
+      <section className="py-16 border-t border-slate-900 bg-slate-950/20 relative z-10 text-left">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-2xl font-bold text-white sm:text-3xl">Latest & Trending Questions</h2>
+            <p className="text-slate-400 text-xs mt-2">Drill technical concepts on recently asked candidate sheets from major tech firms.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              {
+                question: "What is the Virtual DOM and how does React use it to render pages?",
+                category: "React",
+                slug: "what-is-virtual-dom",
+                difficulty: "easy"
+              },
+              {
+                question: "Explain the Event Loop in Node.js and its phases.",
+                category: "Node.js",
+                slug: "what-is-event-loop",
+                difficulty: "hard"
+              },
+              {
+                question: "How do you optimize FlatList rendering performance in React Native?",
+                category: "React Native",
+                slug: "what-is-flatlist",
+                difficulty: "hard"
+              },
+              {
+                question: "What is the difference between interfaces and type aliases in TypeScript?",
+                category: "TypeScript",
+                slug: "interface-vs-type",
+                difficulty: "easy"
+              }
+            ].map((q, idx) => (
+              <Link
+                key={idx}
+                href={`/questions/${q.category.toLowerCase().replace(/[^a-z0-9]+/g, "-")}/${q.slug}`}
+                className="bg-glass border border-slate-800 hover:border-brand-purple/40 rounded-xl p-5 hover:bg-slate-900/10 flex flex-col justify-between transition-all"
+              >
+                <div>
+                  <span className="inline-block text-[8px] font-black uppercase bg-brand-purple/10 text-brand-purple border border-brand-purple/20 px-2 py-0.5 rounded mb-2">
+                    {q.category}
+                  </span>
+                  <h3 className="text-xs font-bold text-slate-200 leading-snug">{q.question}</h3>
+                </div>
+                <div className="text-[10px] text-brand-cyan font-bold hover:underline mt-4 pt-3 border-t border-slate-800/40 inline-flex items-center space-x-0.5">
+                  <span>Practice Card</span>
+                  <ArrowRight className="h-3 w-3" />
+                </div>
               </Link>
             ))}
           </div>
@@ -481,161 +606,37 @@ export default function LandingClient({ initialBlogs }: LandingClientProps) {
 
       {/* 9. Pricing Section */}
       <section className="py-20 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10" id="pricing">
-        {FREE_BETA ? (
-          <div className="bg-gradient-to-tr from-brand-purple/20 via-slate-900/80 to-brand-cyan/20 rounded-2xl p-8 md:p-12 border border-brand-purple/40 text-center max-w-3xl mx-auto shadow-[0_0_50px_rgba(139,92,246,0.15)] relative overflow-hidden">
-            <span className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-brand-cyan/20 border border-brand-cyan/30 text-brand-cyan text-[10px] px-3.5 py-1 rounded-full font-bold uppercase tracking-wider animate-pulse">
-              Beta Launch Special
-            </span>
-            <Crown className="h-10 w-10 text-brand-cyan mx-auto mb-4" />
-            <h2 className="text-2xl md:text-3xl font-black text-white mb-3">100% Free Public Beta Access</h2>
-            <p className="text-slate-300 text-xs md:text-sm max-w-xl mx-auto leading-relaxed mb-6">
-              We are currently in our launch phase. Enjoy unlimited AI Mock Interviews, full ATS Resume checks, and complete access to all 200+ interview prep cards completely for free. No credit card required.
-            </p>
-            <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-6">
-              <div className="flex items-center space-x-2 text-xs text-slate-350">
-                <CheckCircle className="h-4 w-4 text-emerald-400" />
-                <span>No Paywalls</span>
-              </div>
-              <div className="flex items-center space-x-2 text-xs text-slate-350">
-                <CheckCircle className="h-4 w-4 text-emerald-400" />
-                <span>Unlimited AI Audits</span>
-              </div>
-              <div className="flex items-center space-x-2 text-xs text-slate-350">
-                <CheckCircle className="h-4 w-4 text-emerald-400" />
-                <span>Monaco Code Runner</span>
-              </div>
+        <div className="bg-gradient-to-tr from-brand-purple/20 via-slate-900/80 to-brand-cyan/20 rounded-2xl p-8 md:p-12 border border-brand-purple/40 text-center max-w-3xl mx-auto shadow-[0_0_50px_rgba(139,92,246,0.15)] relative overflow-hidden">
+          <span className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-brand-cyan/20 border border-brand-cyan/30 text-brand-cyan text-[10px] px-3.5 py-1 rounded-full font-bold uppercase tracking-wider animate-pulse">
+            Free Trial Access
+          </span>
+          <Crown className="h-10 w-10 text-brand-cyan mx-auto mb-4" />
+          <h2 className="text-2xl md:text-3xl font-black text-white mb-3">3-Month Free Trial</h2>
+          <p className="text-slate-300 text-xs md:text-sm max-w-xl mx-auto leading-relaxed mb-6">
+            Enjoy unlimited AI Mock Interviews, full ATS Resume checks, and complete access to all 200+ interview prep cards. No credit card required to get started.
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-6">
+            <div className="flex items-center space-x-2 text-xs text-slate-350">
+              <CheckCircle className="h-4 w-4 text-emerald-400" />
+              <span>No Paywalls</span>
             </div>
-            <Link
-              href="/register"
-              className="inline-flex items-center space-x-2 rounded-xl bg-gradient-to-r from-brand-purple to-brand-cyan px-8 py-3.5 text-sm font-bold text-white shadow-xl hover:brightness-110 active:scale-95 transition-all"
-            >
-              <span>Create Your Free Account Now</span>
-              <ArrowRight className="h-4 w-4" />
-            </Link>
+            <div className="flex items-center space-x-2 text-xs text-slate-350">
+              <CheckCircle className="h-4 w-4 text-emerald-400" />
+              <span>Unlimited AI Audits</span>
+            </div>
+            <div className="flex items-center space-x-2 text-xs text-slate-350">
+              <CheckCircle className="h-4 w-4 text-emerald-400" />
+              <span>Monaco Code Runner</span>
+            </div>
           </div>
-        ) : (
-          <>
-            <div className="text-center">
-              <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Flexible, Scalable Plans</h2>
-              <p className="mx-auto mt-4 max-w-xl text-slate-400 text-xs">
-                Start preparing for free, or unlock unlimited AI credits and resume optimizations. Cancel anytime.
-              </p>
-
-              {/* Billing Switcher */}
-              <div className="mt-6 inline-flex items-center p-1 rounded-lg bg-slate-900 border border-slate-800">
-                <button
-                  onClick={() => setBillingPeriod("monthly")}
-                  className={`rounded-md px-4 py-1.5 text-xs font-semibold transition-all ${
-                    billingPeriod === "monthly" ? "bg-brand-purple text-white shadow" : "text-slate-400 hover:text-slate-200"
-                  }`}
-                >
-                  Monthly billing
-                </button>
-                <button
-                  onClick={() => setBillingPeriod("yearly")}
-                  className={`rounded-md px-4 py-1.5 text-xs font-semibold transition-all ${
-                    billingPeriod === "yearly" ? "bg-brand-purple text-white shadow" : "text-slate-400 hover:text-slate-200"
-                  }`}
-                >
-                  Yearly (Save 20%)
-                </button>
-              </div>
-            </div>
-
-            <div className="mt-12 mx-auto max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-8">
-              
-              {/* Free Plan */}
-              <div className="bg-glass rounded-2xl p-8 border border-slate-800 flex flex-col justify-between relative">
-                <div>
-                  <h3 className="text-lg font-bold text-white mb-2">Free Starter</h3>
-                  <p className="text-slate-400 text-xs mb-6 leading-relaxed">Perfect for freshers exploring interview structures.</p>
-                  
-                  <div className="mb-6">
-                    <span className="text-4xl font-extrabold text-white">$0</span>
-                    <span className="text-xs text-slate-500 font-semibold"> / forever</span>
-                  </div>
-
-                  <ul className="space-y-3.5 text-xs text-slate-300 mb-8">
-                    <li className="flex items-center space-x-2.5">
-                      <CheckCircle className="h-4 w-4 text-emerald-400 shrink-0" />
-                      <span>3 structured question cards per category</span>
-                    </li>
-                    <li className="flex items-center space-x-2.5">
-                      <CheckCircle className="h-4 w-4 text-emerald-400 shrink-0" />
-                      <span>1 text-based AI Mock interview session</span>
-                    </li>
-                    <li className="flex items-center space-x-2.5">
-                      <CheckCircle className="h-4 w-4 text-emerald-400 shrink-0" />
-                      <span>Basic resume score analysis</span>
-                    </li>
-                    <li className="flex items-center space-x-2.5 opacity-40">
-                      <CheckCircle className="h-4 w-4 text-slate-600 shrink-0" />
-                      <span>Ad-supported ecosystem layout</span>
-                    </li>
-                  </ul>
-                </div>
-
-                <Link
-                  href="/register"
-                  className="w-full rounded-lg border border-slate-700 bg-slate-900/60 py-3 text-center text-xs font-semibold text-slate-300 hover:text-white hover:border-slate-500 transition-all"
-                >
-                  Start Free Training
-                </Link>
-              </div>
-
-              {/* Premium Plan */}
-              <div className="bg-glass rounded-2xl p-8 border border-brand-purple flex flex-col justify-between relative shadow-[0_0_30px_rgba(139,92,246,0.15)]">
-                <span className="absolute -top-3 right-6 bg-brand-cyan/20 border border-brand-cyan/30 text-brand-cyan text-[9px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider animate-pulse">
-                  Recommended Choice
-                </span>
-                <div>
-                  <h3 className="text-lg font-bold text-white mb-2">Pro Membership</h3>
-                  <p className="text-slate-400 text-xs mb-6 leading-relaxed">For software engineers and job seekers scaling their applications.</p>
-                  
-                  <div className="mb-6">
-                    <span className="text-4xl font-extrabold text-white">
-                      {billingPeriod === "monthly" ? "$29" : "$23"}
-                    </span>
-                    <span className="text-xs text-slate-500 font-semibold">
-                      {billingPeriod === "monthly" ? " / month" : " / month (billed yearly)"}
-                    </span>
-                  </div>
-
-                  <ul className="space-y-3.5 text-xs text-slate-300 mb-8">
-                    <li className="flex items-center space-x-2.5">
-                      <CheckCircle className="h-4 w-4 text-emerald-400 shrink-0" />
-                      <span className="font-semibold">Unlimited preparation questions</span>
-                    </li>
-                    <li className="flex items-center space-x-2.5">
-                      <CheckCircle className="h-4 w-4 text-emerald-400 shrink-0" />
-                      <span className="font-semibold">Unlimited voice-based mock interviews</span>
-                    </li>
-                    <li className="flex items-center space-x-2.5">
-                      <CheckCircle className="h-4 w-4 text-emerald-400 shrink-0" />
-                      <span>Deep ATS resume parsing & word recommendations</span>
-                    </li>
-                    <li className="flex items-center space-x-2.5">
-                      <CheckCircle className="h-4 w-4 text-emerald-400 shrink-0" />
-                      <span className="text-brand-cyan font-semibold">100% ad-free premium container experience</span>
-                    </li>
-                    <li className="flex items-center space-x-2.5">
-                      <CheckCircle className="h-4 w-4 text-emerald-400 shrink-0" />
-                      <span>Priority Slack/Email community access</span>
-                    </li>
-                  </ul>
-                </div>
-
-                <Link
-                  href="/register?plan=premium"
-                  className="w-full rounded-lg bg-gradient-to-r from-brand-purple to-brand-cyan py-3 text-center text-xs font-semibold text-white shadow-lg hover:brightness-110 active:scale-95 transition-all"
-                >
-                  Upgrade to Premium
-                </Link>
-              </div>
-
-            </div>
-          </>
-        )}
+          <Link
+            href="/register"
+            className="inline-flex items-center space-x-2 rounded-xl bg-gradient-to-r from-brand-purple to-brand-cyan px-8 py-3.5 text-sm font-bold text-white shadow-xl hover:brightness-110 active:scale-95 transition-all"
+          >
+            <span>Create Your Free Account Now</span>
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
       </section>
 
       {/* 10. Testimonials */}
@@ -737,12 +738,6 @@ export default function LandingClient({ initialBlogs }: LandingClientProps) {
               className="rounded-lg bg-gradient-to-r from-brand-purple to-brand-cyan px-6 py-3 text-sm font-semibold text-white shadow-xl hover:brightness-110 hover:-translate-y-0.5 active:scale-95 transition-all"
             >
               Get Started for Free
-            </Link>
-            <Link
-              href="/pricing"
-              className="rounded-lg border border-slate-700 bg-slate-950 px-6 py-3 text-sm font-semibold text-slate-300 hover:text-white transition-all"
-            >
-              View Pricing Tiers
             </Link>
           </div>
         </div>

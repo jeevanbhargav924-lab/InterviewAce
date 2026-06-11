@@ -9,6 +9,7 @@ const TestCaseSchema = new Schema({
 const ChallengeSchema = new Schema(
   {
     title: { type: String, required: true },
+    slug: { type: String, required: true, unique: true, index: true },
     description: { type: String, required: true },
     difficulty: { type: String, enum: ["easy", "medium", "hard"], default: "medium" },
     category: { 
@@ -17,6 +18,7 @@ const ChallengeSchema = new Schema(
       required: true 
     },
     starterCode: { type: String, required: true },
+    functionName: { type: String, required: true },
     testCases: [TestCaseSchema],
     companyTags: [{ type: String }],
   },

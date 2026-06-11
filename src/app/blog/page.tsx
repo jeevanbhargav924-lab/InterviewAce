@@ -46,8 +46,16 @@ export default function BlogFeedPage() {
           url += `search=${encodeURIComponent(searchQuery)}&`;
         }
         const res = await fetch(url);
-        const data = await res.json();
-        setBlogs(data);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            setBlogs(data);
+          } else {
+            setBlogs([]);
+          }
+        } else {
+          setBlogs([]);
+        }
       } catch (err) {
         console.error("Failed to load blog posts:", err);
       } finally {

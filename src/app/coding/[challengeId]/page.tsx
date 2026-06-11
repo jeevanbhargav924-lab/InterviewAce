@@ -136,12 +136,31 @@ export default function CodeWorkspacePage() {
   const [activeTab, setActiveTab] = useState<"desc" | "console">("desc");
 
   useEffect(() => {
-    // Check database mock keys
-    const data = PROBLEM_DB[challengeId];
-    if (data) {
-      setChallenge(data);
-      setCode(data.starterCode);
+    async function loadChallenge() {
+      try {
+        const res = await fetch(`/api/challenges?id=${encodeURIComponent(challengeId)}`);
+        if (res.ok) {
+          const data = await res.json();
+          setChallenge(data);
+          setCode(data.starterCode);
+        } else {
+          // Fall back to local PROBLEM_DB config
+          const localData = PROBLEM_DB[challengeId];
+          if (localData) {
+            setChallenge(localData);
+            setCode(localData.starterCode);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load challenge from API, falling back to local PROBLEM_DB", err);
+        const localData = PROBLEM_DB[challengeId];
+        if (localData) {
+          setChallenge(localData);
+          setCode(localData.starterCode);
+        }
+      }
     }
+    loadChallenge();
   }, [challengeId]);
 
   if (!challenge) {

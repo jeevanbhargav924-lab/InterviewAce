@@ -37,95 +37,102 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Site Navigation Links */}
+          {/* Company Links */}
           <div>
-            <h3 className="text-sm font-semibold text-slate-200 uppercase tracking-wider mb-4">
-              Platform Features
+            <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider mb-4">
+              Company
             </h3>
             <ul className="space-y-2.5 text-xs">
               <li>
-                <Link href="/prepare" className="flex items-center space-x-1.5 hover:text-white transition-colors">
-                  <Compass className="h-3.5 w-3.5" />
-                  <span>Interview Prepare Questions</span>
+                <Link href="/about" className="hover:text-white transition-colors">
+                  About Us
                 </Link>
               </li>
               <li>
-                <Link href="/mock-interview" className="flex items-center space-x-1.5 hover:text-white transition-colors">
-                  <Cpu className="h-3.5 w-3.5" />
-                  <span>AI Mock Interviews</span>
+                <Link href="/contact" className="hover:text-white transition-colors">
+                  Contact
                 </Link>
               </li>
               <li>
-                <Link href="/coding" className="flex items-center space-x-1.5 hover:text-white transition-colors">
-                  <Terminal className="h-3.5 w-3.5" />
-                  <span>Coding Challenge Editor</span>
+                <Link href="/privacy-policy" className="hover:text-white transition-colors">
+                  Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="/resume-analyzer" className="flex items-center space-x-1.5 hover:text-white transition-colors">
-                  <FileText className="h-3.5 w-3.5" />
-                  <span>ATS Resume Reviewer</span>
+                <Link href="/terms-and-conditions" className="hover:text-white transition-colors">
+                  Terms & Conditions
+                </Link>
+              </li>
+              <li>
+                <Link href="/disclaimer" className="hover:text-white transition-colors">
+                  Disclaimer
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Affiliate links (Monetization Requirement) */}
+          {/* Resources Links */}
           <div>
-            <h3 className="text-sm font-semibold text-slate-200 uppercase tracking-wider mb-4">
-              Developer Resources
+            <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider mb-4">
+              Resources
             </h3>
             <ul className="space-y-2.5 text-xs">
-              {affiliateResources.map((res, i) => (
-                <li key={i}>
-                  <a
-                    href={res.url}
-                    className="group flex items-center justify-between hover:text-white transition-colors"
-                  >
-                    <div className="flex flex-col">
-                      <span className="font-medium">{res.name}</span>
-                      <span className="text-[10px] text-slate-600 dark:text-slate-500">{res.desc}</span>
-                    </div>
-                    <ExternalLink className="h-3 w-3 text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </a>
-                </li>
-              ))}
+              <li>
+                <Link href="/prepare" className="hover:text-white transition-colors">
+                  Interview Questions
+                </Link>
+              </li>
+              <li>
+                <Link href="/blog" className="hover:text-white transition-colors">
+                  Blogs & Articles
+                </Link>
+              </li>
+              <li>
+                <Link href="/#pricing" className="hover:text-white transition-colors">
+                  Learning Paths
+                </Link>
+              </li>
             </ul>
           </div>
 
-          {/* Newsletter Box */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-slate-200 uppercase tracking-wider">
-              Weekly Prep Tips
+          {/* Categories Links */}
+          <div>
+            <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider mb-4">
+              Categories
             </h3>
-            <p className="text-xs text-slate-500 leading-relaxed">
-              Subscribe to get curated DSA study guides and HR question breakdowns directly in your inbox.
-            </p>
-            <form className="flex space-x-2" onSubmit={(e) => e.preventDefault()}>
-              <input
-                type="email"
-                placeholder="developer@domain.com"
-                required
-                className="w-full rounded bg-slate-900 border border-slate-800 px-3 py-1.5 text-xs text-white placeholder-slate-600 focus:border-brand-purple focus:outline-none transition-colors"
-              />
-              <button
-                type="submit"
-                className="rounded bg-gradient-to-r from-brand-purple to-brand-cyan px-3 py-1.5 text-xs font-semibold text-white hover:brightness-110 active:scale-95 transition-all"
-              >
-                Join
-              </button>
-            </form>
+            <ul className="space-y-2.5 text-xs">
+              <li>
+                <Link href="/questions/react" className="hover:text-white transition-colors">
+                  React Pack
+                </Link>
+              </li>
+              <li>
+                <Link href="/questions/react-native" className="hover:text-white transition-colors">
+                  React Native Pack
+                </Link>
+              </li>
+              <li>
+                <Link href="/questions/nodejs" className="hover:text-white transition-colors">
+                  Node.js Pack
+                </Link>
+              </li>
+              <li>
+                <Link href="/questions/javascript" className="hover:text-white transition-colors">
+                  JavaScript Pack
+                </Link>
+              </li>
+            </ul>
           </div>
 
         </div>
 
         {/* Legal bottom row */}
         <div className="mt-8 pt-8 border-t border-slate-800/60 flex flex-col md:flex-row items-center justify-between text-xs text-slate-600">
-          <p>© {currentYear} InterviewAce AI Inc. All rights reserved.</p>
+          <p>© {currentYear} InterviewsAceAI.online. All rights reserved.</p>
           <div className="flex space-x-4 mt-4 md:mt-0">
-            <Link href="/privacy" className="hover:underline">Privacy Policy</Link>
-            <Link href="/terms" className="hover:underline">Terms of Service</Link>
-            <Link href="#" className="hover:underline">Affiliate Disclosure</Link>
+            <Link href="/privacy-policy" className="hover:underline">Privacy Policy</Link>
+            <Link href="/terms-and-conditions" className="hover:underline">Terms of Service</Link>
+            <Link href="/disclaimer" className="hover:underline">Disclaimer</Link>
           </div>
         </div>
       </div>

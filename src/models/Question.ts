@@ -3,7 +3,9 @@ import mongoose, { Schema, model, models } from "mongoose";
 const QuestionSchema = new Schema(
   {
     question: { type: String, required: true },
+    slug: { type: String, required: true, unique: true, index: true },
     answer: { type: String, required: true },
+    example: { type: String, default: "" },
     category: { 
       type: String, 
       required: true,
@@ -16,11 +18,19 @@ const QuestionSchema = new Schema(
         "Node.js", 
         "MongoDB", 
         "HR", 
-        "Behavioral"
+        "Behavioral",
+        "HR Interview"
       ] 
     },
     difficulty: { type: String, enum: ["easy", "medium", "hard"], default: "medium" },
     tags: [{ type: String }],
+    faqs: [
+      {
+        question: { type: String, required: true },
+        answer: { type: String, required: true }
+      }
+    ],
+    views: { type: Number, default: 0 }
   },
   { timestamps: true }
 );

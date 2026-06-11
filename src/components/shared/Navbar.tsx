@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { useTheme } from "./Providers";
 import { FREE_BETA } from "@/lib/config";
+import SearchOverlay from "./SearchOverlay";
 import { 
   Sun, 
   Moon, 
@@ -19,7 +20,8 @@ import {
   Cpu, 
   Terminal, 
   FileText, 
-  BookOpen
+  BookOpen,
+  Search
 } from "lucide-react";
 
 export default function Navbar() {
@@ -28,6 +30,18 @@ export default function Navbar() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setSearchOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const navigation = [
     { name: "Prepare", href: "/prepare", icon: Compass },
@@ -92,6 +106,18 @@ export default function Navbar() {
 
           {/* Right Header Options */}
           <div className="hidden md:flex items-center space-x-4">
+            {/* Search Trigger Button */}
+            <button
+              onClick={() => setSearchOpen(true)}
+              className="hidden md:flex items-center space-x-2 text-slate-400 bg-slate-950 hover:bg-slate-900 border border-slate-800/80 rounded-lg px-3 py-1.5 text-xs transition-all w-36 text-left cursor-pointer focus:outline-none focus:ring-1 focus:ring-brand-purple"
+            >
+              <Search className="h-3.5 w-3.5" />
+              <span className="flex-1 truncate">Search prep...</span>
+              <kbd className="hidden xl:inline-block font-mono text-[9px] bg-slate-800 border border-slate-700 rounded px-1 text-slate-500">
+                ⌘K
+              </kbd>
+            </button>
+
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
@@ -265,6 +291,7 @@ export default function Navbar() {
           )}
         </div>
       )}
+      <SearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
     </nav>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
@@ -53,11 +53,46 @@ const STATIC_CHALLENGES: Challenge[] = [
 ];
 
 export default function CodingChallengesPage() {
+  const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedFilter, setSelectedFilter] = useState<string>("all");
+
+  useEffect(() => {
+    async function loadChallenges() {
+      setLoading(true);
+      try {
+        const res = await fetch("/api/challenges");
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            const mapped = data.map((c: any) => ({
+              id: c.slug || c._id,
+              title: c.title,
+              category: c.category,
+              difficulty: c.difficulty,
+              description: c.description.length > 150 ? c.description.substring(0, 150) + "..." : c.description,
+              companies: c.companyTags || []
+            }));
+            setChallenges(mapped);
+          } else {
+            setChallenges(STATIC_CHALLENGES);
+          }
+        } else {
+          setChallenges(STATIC_CHALLENGES);
+        }
+      } catch (err) {
+        console.error("Failed to load challenges from API. Falling back to static data.", err);
+        setChallenges(STATIC_CHALLENGES);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadChallenges();
+  }, []);
   
   const filtered = selectedFilter === "all" 
-    ? STATIC_CHALLENGES 
-    : STATIC_CHALLENGES.filter(c => c.category === selectedFilter);
+    ? challenges 
+    : challenges.filter(c => c.category === selectedFilter);
 
   return (
     <div className="flex flex-col min-h-screen bg-[#030014]">

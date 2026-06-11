@@ -32,7 +32,7 @@ export default function PreparePage() {
 
   const hasPremiumRecord = (session?.user as any)?.subscription?.plan === "premium" && 
                           (session?.user as any)?.subscription?.status === "active";
-  const isPremium = FREE_BETA || hasPremiumRecord;
+  const isPremium = true;
 
   useEffect(() => {
     async function loadQuestions() {
@@ -43,8 +43,16 @@ export default function PreparePage() {
           url += `&difficulty=${selectedDifficulty}`;
         }
         const res = await fetch(url);
-        const data = await res.json();
-        setQuestions(data);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            setQuestions(data);
+          } else {
+            setQuestions([]);
+          }
+        } else {
+          setQuestions([]);
+        }
       } catch (err) {
         console.error("Failed to load questions:", err);
       } finally {
@@ -58,13 +66,9 @@ export default function PreparePage() {
     setVisibleAnswers(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
-  // Limit questions for free tier (only first 3 are readable, rest are locked)
+  // Return all questions directly
   const getDisplayQuestions = () => {
-    if (isPremium) return questions;
-    return questions.map((q, idx) => ({
-      ...q,
-      isLocked: idx >= 3
-    }));
+    return questions;
   };
 
   return (
@@ -163,35 +167,21 @@ export default function PreparePage() {
                     {q.question}
                   </h3>
 
-                  {q.isLocked ? (
-                    <div className="rounded-lg bg-slate-950/80 border border-slate-800 p-6 text-center">
-                      <Lock className="h-6 w-6 text-brand-purple mx-auto mb-2.5" />
-                      <p className="text-xs font-bold text-white mb-1">Premium Card Lock</p>
-                      <p className="text-[11px] text-slate-500 mb-3">You have read all free questions in this category. Upgrade to reveal answers.</p>
-                      <button
-                        onClick={() => window.location.href = "/pricing"}
-                        className="rounded bg-gradient-to-r from-brand-purple to-brand-cyan px-4 py-1.5 text-[10px] font-semibold text-white hover:brightness-110"
-                      >
-                        Upgrade to Pro
-                      </button>
-                    </div>
-                  ) : (
-                    <div>
-                      <button
-                        onClick={() => toggleAnswer(q._id)}
-                        className="flex items-center space-x-1 text-xs text-brand-cyan hover:text-brand-purple font-semibold focus:outline-none"
-                      >
-                        <span>{visibleAnswers[q._id] ? "Hide Answer" : "Show Best Answer"}</span>
-                        <ChevronDown className={`h-4 w-4 transition-transform ${visibleAnswers[q._id] ? "rotate-180" : ""}`} />
-                      </button>
+                  <div>
+                    <button
+                      onClick={() => toggleAnswer(q._id)}
+                      className="flex items-center space-x-1 text-xs text-brand-cyan hover:text-brand-purple font-semibold focus:outline-none"
+                    >
+                      <span>{visibleAnswers[q._id] ? "Hide Answer" : "Show Best Answer"}</span>
+                      <ChevronDown className={`h-4 w-4 transition-transform ${visibleAnswers[q._id] ? "rotate-180" : ""}`} />
+                    </button>
 
-                      {visibleAnswers[q._id] && (
-                        <div className="mt-4 p-4 rounded-lg bg-slate-950 border border-slate-800/80 text-xs text-slate-300 leading-relaxed font-normal animate-fadeIn">
-                          {q.answer}
-                        </div>
-                      )}
-                    </div>
-                  )}
+                    {visibleAnswers[q._id] && (
+                      <div className="mt-4 p-4 rounded-lg bg-slate-950 border border-slate-800/80 text-xs text-slate-300 leading-relaxed font-normal animate-fadeIn">
+                        {q.answer}
+                      </div>
+                    )}
+                  </div>
 
                 </div>
               ))
@@ -201,29 +191,7 @@ export default function PreparePage() {
           {/* Right sidebar details */}
           <div className="space-y-6">
             
-            {/* Promo banner */}
-            {FREE_BETA ? (
-              <div className="bg-gradient-to-tr from-brand-purple/20 to-brand-cyan/20 rounded-xl p-5 border border-brand-purple/40 text-center relative overflow-hidden">
-                <Crown className="h-7 w-7 text-brand-cyan mx-auto mb-3" />
-                <h4 className="text-xs font-bold text-white mb-1">Free Beta Special!</h4>
-                <p className="text-[10px] text-slate-300 leading-relaxed mb-1">All 200+ premium cards are currently unlocked for free practice during our public launch phase.</p>
-                <div className="text-[9px] text-brand-cyan font-bold uppercase mt-3 tracking-wider">
-                  No Subscription Required
-                </div>
-              </div>
-            ) : !isPremium && (
-              <div className="bg-gradient-to-tr from-brand-purple/20 to-brand-cyan/20 rounded-xl p-5 border border-brand-purple/40 text-center relative overflow-hidden">
-                <Crown className="h-7 w-7 text-brand-cyan mx-auto mb-3" />
-                <h4 className="text-xs font-bold text-white mb-1">Unlock 200+ Locked Cards</h4>
-                <p className="text-[10px] text-slate-300 leading-relaxed mb-4">Master TS generics, Node streams, Next.js caches, and system structures.</p>
-                <button
-                  onClick={() => window.location.href = "/pricing"}
-                  className="w-full rounded bg-brand-cyan hover:brightness-110 py-2 text-[10px] font-semibold text-white"
-                >
-                  Unlock Premium Access
-                </button>
-              </div>
-            )}
+            {/* Sidebar info */}
 
             {/* Sidebar ad banner */}
             <AdPlaceholder position="sidebar" />

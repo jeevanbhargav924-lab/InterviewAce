@@ -37,9 +37,23 @@ export async function dbConnect() {
       bufferCommands: false,
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongooseInstance) => {
-      return mongooseInstance;
-    });
+    cached.promise = mongoose.connect(MONGODB_URI, opts)
+      .then((mongooseInstance) => {
+        return mongooseInstance;
+      })
+      .catch(async (err) => {
+        const localUri = "mongodb://localhost:27017/interviewace";
+        if (MONGODB_URI !== localUri) {
+          console.warn(`[MongoDB] Primary connection failed: ${err.message}. Attempting local fallback to: ${localUri}`);
+          try {
+            return await mongoose.connect(localUri, opts);
+          } catch (localErr: any) {
+            console.error(`[MongoDB] Local fallback database also failed: ${localErr.message}`);
+            throw localErr;
+          }
+        }
+        throw err;
+      });
   }
 
   try {

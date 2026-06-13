@@ -20,7 +20,7 @@ export default function TermsAndConditionsPage() {
 
         <section className="space-y-6 text-sm">
           <p>
-            Welcome to <strong>InterviewAceAI.online</strong>. These terms and conditions outline the rules and regulations for the use of InterviewAceAI.online's Website, located at <a href="https://interviewaceai.online" className="text-brand-cyan hover:underline">https://interviewaceai.online</a>.
+            Welcome to <strong>InterviewAceAI.online</strong>. These terms and conditions outline the rules and regulations for the use of InterviewAceAI.online's Website, located at <a href="https://www.interviewaceai.online" className="text-brand-cyan hover:underline">https://www.interviewaceai.online</a>.
           </p>
 
           <div>

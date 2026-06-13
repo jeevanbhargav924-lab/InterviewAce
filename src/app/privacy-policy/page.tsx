@@ -20,7 +20,7 @@ export default function PrivacyPolicyPage() {
 
         <section className="space-y-6 text-sm">
           <p>
-            At <strong>InterviewAceAI.online</strong> (accessible from <a href="https://interviewaceai.online" className="text-brand-cyan hover:underline">https://interviewaceai.online</a>), one of our main priorities is the privacy of our visitors. This Privacy Policy document contains types of information that is collected and recorded by InterviewAceAI.online and how we use it.
+            At <strong>InterviewAceAI.online</strong> (accessible from <a href="https://www.interviewaceai.online" className="text-brand-cyan hover:underline">https://www.interviewaceai.online</a>), one of our main priorities is the privacy of our visitors. This Privacy Policy document contains types of information that is collected and recorded by InterviewAceAI.online and how we use it.
           </p>
 
           <div>

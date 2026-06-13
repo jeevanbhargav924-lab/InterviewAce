@@ -5,7 +5,7 @@ import Blog from "@/models/Blog";
 import Challenge from "@/models/Challenge";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = "https://interviewaceai.online";
+  const baseUrl = "https://www.interviewaceai.online";
 
   // Static site paths
   const staticPaths: MetadataRoute.Sitemap = [

@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: QuestionPageProps): Promise<M
       title: `${qDoc.question} - ${qDoc.category} Interview Answer | InterviewAceAI`,
       description: `Detailed technical response, code examples, and explanation sheet for: ${qDoc.question}`,
       alternates: {
-        canonical: `https://interviewaceai.online/questions/${category}/${slug}`
+        canonical: `https://www.interviewaceai.online/questions/${category}/${slug}`
       }
     };
   } catch (e) {
@@ -98,19 +98,19 @@ export default async function QuestionDetailPage({ params }: QuestionPageProps) 
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": "https://interviewaceai.online"
+        "item": "https://www.interviewaceai.online"
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": `${catLabel} Questions`,
-        "item": `https://interviewaceai.online/questions/${category}`
+        "item": `https://www.interviewaceai.online/questions/${category}`
       },
       {
         "@type": "ListItem",
         "position": 3,
         "name": qDoc.question,
-        "item": `https://interviewaceai.online/questions/${category}/${slug}`
+        "item": `https://www.interviewaceai.online/questions/${category}/${slug}`
       }
     ]
   };

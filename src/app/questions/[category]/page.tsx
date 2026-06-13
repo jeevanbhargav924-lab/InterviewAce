@@ -79,7 +79,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
     title: `${info.name} Interview Questions & Preparation Guides | InterviewAceAI`,
     description: info.intro || `Master technical ${info.name} interview questions, study guides, and mock preparation materials.`,
     alternates: {
-      canonical: `https://interviewaceai.online/questions/${resolvedParams.category.toLowerCase()}`
+      canonical: `https://www.interviewaceai.online/questions/${resolvedParams.category.toLowerCase()}`
     }
   };
 }
@@ -124,14 +124,14 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     "@type": "CollectionPage",
     "name": `${info.name} Interview Questions & Preparation Guides`,
     "description": info.intro,
-    "url": `https://interviewaceai.online/questions/${catKey}`,
+    "url": `https://www.interviewaceai.online/questions/${catKey}`,
     "mainEntity": {
       "@type": "ItemList",
       "numberOfItems": questions.length,
       "itemListElement": questions.map((q: any, idx) => ({
         "@type": "ListItem",
         "position": idx + 1,
-        "url": `https://interviewaceai.online/questions/${catKey}/${q.slug}`
+        "url": `https://www.interviewaceai.online/questions/${catKey}/${q.slug}`
       }))
     }
   };

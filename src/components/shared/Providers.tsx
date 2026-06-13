@@ -78,7 +78,7 @@ function RouteGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (status === "loading" || firebaseLoading) return;
 
-    const protectedRoutes = ["/dashboard", "/resume-analyzer", "/prepare", "/mock-interview", "/admin"];
+    const protectedRoutes = ["/dashboard", "/admin"];
     const isProtected = protectedRoutes.some(route => pathname === route || pathname.startsWith(route + "/"));
 
     const authRoutes = ["/login", "/register", "/signup"];
@@ -89,7 +89,7 @@ function RouteGuard({ children }: { children: React.ReactNode }) {
       if (isAuthRoute || pathname === "/verify-email") {
         router.push("/");
       }
-    } 
+    }
     // 2. Unauthenticated in NextAuth
     else if (status === "unauthenticated") {
       if (firebaseUser && !firebaseUser.emailVerified) {
@@ -106,7 +106,7 @@ function RouteGuard({ children }: { children: React.ReactNode }) {
     }
   }, [session, status, firebaseUser, firebaseLoading, pathname, router]);
 
-  const protectedRoutes = ["/dashboard", "/resume-analyzer", "/prepare", "/mock-interview", "/admin"];
+  const protectedRoutes = ["/dashboard", "/admin"];
   const isProtected = protectedRoutes.some(route => pathname === route || pathname.startsWith(route + "/"));
 
   if (isProtected && (status === "loading" || firebaseLoading || status === "unauthenticated")) {

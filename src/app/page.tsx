@@ -11,7 +11,7 @@ export const revalidate = 0;
 
 export default async function Home() {
   let blogs: any[] = [];
-  
+
   try {
     await dbConnect();
     const rawBlogs = await Blog.find({})
@@ -19,7 +19,7 @@ export default async function Home() {
       .limit(3)
       .select("title slug summary category coverImage")
       .lean();
-    
+
     blogs = rawBlogs.map((b: any) => ({
       title: b.title,
       slug: b.slug,
@@ -30,7 +30,7 @@ export default async function Home() {
   } catch (error) {
     console.error("Database connection failed in Landing page server fetch. Falling back to static values.", error);
   }
-
+  console.log("ffffffffffffffffff")
   // Fallback blogs if database is not seeded/reachable
   const displayBlogs = blogs.length > 0 ? blogs : [
     {
@@ -60,7 +60,7 @@ export default async function Home() {
     <div className="flex flex-col min-h-screen relative bg-[#030014]">
       {/* Absolute cursor overlay */}
       <CustomCursor />
-      
+
       {/* Top Banner Navbar */}
       <Navbar />
 

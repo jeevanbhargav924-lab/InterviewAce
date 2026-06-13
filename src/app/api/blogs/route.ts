@@ -93,10 +93,9 @@ export async function GET(req: Request) {
     const slug = searchParams.get("slug");
     const search = searchParams.get("search");
 
-    // Seed fresh details if new slugs don't exist
-    const hasNewSeed = await Blog.findOne({ slug: "react-interview-questions-2026" });
-    if (!hasNewSeed) {
-      await Blog.deleteMany({});
+    // Seed fallback details only if the database is completely empty
+    const blogCount = await Blog.countDocuments();
+    if (blogCount === 0) {
       await Blog.insertMany(SEED_BLOGS);
     }
 
@@ -133,17 +132,19 @@ export async function POST(req: Request) {
   try {
     await dbConnect();
     const body = await req.json();
-    
-    // Check if we are creating a new blog post
-    if (body.title && body.content && body.category) {
-      const { title, content, category, summary, tags, coverImage, author } = body;
+
+    const formatBlog = (data: any) => {
+      const { title, content, category, summary, tags, coverImage, author } = data;
+      if (!title || !content || !category) {
+        throw new Error(`Missing required fields (title, content, or category) for: "${title || 'Unknown'}"`);
+      }
       
       const slug = title
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/(^-|-$)+/g, "");
 
-      const newBlog = await Blog.create({
+      return {
         title,
         slug,
         summary: summary || title.substring(0, 150) + "...",
@@ -159,8 +160,26 @@ export async function POST(req: Request) {
         isFeatured: false,
         views: 0,
         comments: []
-      });
+      };
+    };
 
+    if (Array.isArray(body)) {
+      if (body.length === 0) {
+        return NextResponse.json({ message: "Empty blogs array provided" }, { status: 400 });
+      }
+      const preparedBlogs = body.map((item: any) => formatBlog(item));
+      const newBlogs = await Blog.insertMany(preparedBlogs);
+      return NextResponse.json({
+        message: `Successfully inserted ${newBlogs.length} blog posts`,
+        insertedCount: newBlogs.length,
+        data: newBlogs
+      }, { status: 201 });
+    }
+
+    // Check if we are creating a new blog post
+    if (body.title && body.content && body.category) {
+      const prepared = formatBlog(body);
+      const newBlog = await Blog.create(prepared);
       return NextResponse.json(newBlog, { status: 201 });
     }
 
@@ -184,6 +203,6 @@ export async function POST(req: Request) {
     return NextResponse.json(updatedBlog);
   } catch (error: any) {
     console.error("Blogs POST API error:", error);
-    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ message: error.message || "Internal Server Error" }, { status: 500 });
   }
 }

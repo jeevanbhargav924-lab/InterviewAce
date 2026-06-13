@@ -25,8 +25,12 @@ const BlogSchema = new Schema(
         "JavaScript",
         "TypeScript",
         "Next.js",
+        "Node.js",
+        "Node.js / Backend",
+        "MongoDB",
         "Career Growth",
         "Interview Preparation",
+        "Interview Tips",
         "Resume Tips",
         "System Design",
         "AI Tools"

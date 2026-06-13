@@ -174,30 +174,47 @@ export async function POST(req: Request) {
   try {
     await dbConnect();
     const body = await req.json();
-    const { question, answer, category, difficulty, tags, example, faqs } = body;
 
-    if (!question || !answer || !category || !difficulty) {
-      return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
+    const formatQuestion = (data: any) => {
+      const { question, answer, category, difficulty, tags, example, faqs } = data;
+      if (!question || !answer || !category || !difficulty) {
+        throw new Error(`Missing required fields (question, answer, category, or difficulty) for: "${question || 'Unknown'}"`);
+      }
+
+      const slug = question
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)+/g, "");
+
+      return {
+        question,
+        slug,
+        answer,
+        category,
+        difficulty: difficulty.toLowerCase(),
+        tags: tags || [],
+        example: example || "",
+        faqs: faqs || [],
+        views: 0
+      };
+    };
+
+    if (Array.isArray(body)) {
+      if (body.length === 0) {
+        return NextResponse.json({ message: "Empty questions array provided" }, { status: 400 });
+      }
+      const preparedQuestions = body.map((item: any) => formatQuestion(item));
+      const newQuestions = await Question.insertMany(preparedQuestions);
+      return NextResponse.json({
+        message: `Successfully inserted ${newQuestions.length} questions`,
+        insertedCount: newQuestions.length,
+        data: newQuestions
+      }, { status: 201 });
+    } else {
+      const prepared = formatQuestion(body);
+      const newQuestion = await Question.create(prepared);
+      return NextResponse.json(newQuestion, { status: 201 });
     }
-
-    const slug = question
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)+/g, "");
-
-    const newQuestion = await Question.create({
-      question,
-      slug,
-      answer,
-      category,
-      difficulty: difficulty.toLowerCase(),
-      tags: tags || [],
-      example: example || "",
-      faqs: faqs || [],
-      views: 0
-    });
-
-    return NextResponse.json(newQuestion, { status: 201 });
   } catch (error: any) {
     console.error("Questions POST API error:", error);
     return NextResponse.json({ message: error.message || "Internal Server Error" }, { status: 500 });

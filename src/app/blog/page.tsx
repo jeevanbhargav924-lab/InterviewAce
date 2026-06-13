@@ -31,7 +31,7 @@ export default function BlogFeedPage() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const categories = [
-    "all", "React", "React Native", "JavaScript", "TypeScript", "Next.js", "Career Growth", "Interview Preparation", "Resume Tips", "System Design", "AI Tools"
+    "all", "React", "React Native", "JavaScript", "TypeScript", "Next.js", "Node.js", "Node.js / Backend", "MongoDB", "Career Growth", "Interview Preparation", "Interview Tips", "Resume Tips", "System Design", "AI Tools"
   ];
 
   useEffect(() => {

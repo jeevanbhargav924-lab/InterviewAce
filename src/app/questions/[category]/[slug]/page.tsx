@@ -21,7 +21,13 @@ export async function generateMetadata({ params }: QuestionPageProps): Promise<M
 
   try {
     await dbConnect();
-    const qDoc = await Question.findOne({ slug }).select("question category").lean();
+    let qDoc = null;
+    if (slug.match(/^[0-9a-fA-F]{24}$/)) {
+      qDoc = await Question.findById(slug).select("question category").lean();
+    } else {
+      qDoc = await Question.findOne({ slug }).select("question category").lean();
+    }
+
     if (!qDoc) {
       return { title: "Question Not Found | InterviewsAceAI" };
     }
@@ -48,11 +54,19 @@ export default async function QuestionDetailPage({ params }: QuestionPageProps) 
     await dbConnect();
 
     // Fetch target question and increment views
-    qDoc = await Question.findOneAndUpdate(
-      { slug },
-      { $inc: { views: 1 } },
-      { new: true }
-    ).lean();
+    if (slug.match(/^[0-9a-fA-F]{24}$/)) {
+      qDoc = await Question.findByIdAndUpdate(
+        slug,
+        { $inc: { views: 1 } },
+        { new: true }
+      ).lean();
+    } else {
+      qDoc = await Question.findOneAndUpdate(
+        { slug },
+        { $inc: { views: 1 } },
+        { new: true }
+      ).lean();
+    }
 
     if (qDoc) {
       // Fetch related questions in same category

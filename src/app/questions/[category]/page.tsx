@@ -182,7 +182,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
                 {questions.map((q: any, idx) => (
                   <Link
                     key={q._id}
-                    href={`/questions/${catKey}/${q.slug}`}
+                    href={`/questions/${catKey}/${(q.slug && q.slug !== "undefined") ? q.slug : q._id}`}
                     className="bg-glass border border-slate-800/80 hover:border-slate-700 p-5 rounded-xl flex flex-col justify-between hover:bg-slate-900/10 transition-all duration-200 text-left group"
                   >
                     <div>

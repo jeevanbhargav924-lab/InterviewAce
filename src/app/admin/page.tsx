@@ -43,6 +43,15 @@ export default function AdminDashboardPage() {
   const [newDifficulty, setNewDifficulty] = useState("medium");
   const [newTags, setNewTags] = useState("");
   const [formSuccess, setFormSuccess] = useState(false);
+  const [uploadMode, setUploadMode] = useState<"single" | "bulk">("single");
+  const [bulkJson, setBulkJson] = useState("");
+  const [bulkError, setBulkError] = useState("");
+  const [blogUploadMode, setBlogUploadMode] = useState<"single" | "bulk">("single");
+  const [blogBulkJson, setBlogBulkJson] = useState("");
+  const [blogBulkError, setBlogBulkError] = useState("");
+  const [codingUploadMode, setCodingUploadMode] = useState<"single" | "bulk">("single");
+  const [codingBulkJson, setCodingBulkJson] = useState("");
+  const [codingBulkError, setCodingBulkError] = useState("");
 
   // Form states for adding new blog posts
   const [newBlogTitle, setNewBlogTitle] = useState("");
@@ -140,6 +149,37 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const handleAddBulkQuestions = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormSuccess(false);
+    setBulkError("");
+
+    try {
+      const parsed = JSON.parse(bulkJson);
+      if (!Array.isArray(parsed)) {
+        setBulkError("Input must be a JSON array of question objects.");
+        return;
+      }
+
+      const res = await fetch("/api/questions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(parsed)
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        setFormSuccess(true);
+        setBulkJson("");
+      } else {
+        setBulkError(data.message || "Failed to upload bulk questions.");
+      }
+    } catch (err: any) {
+      setBulkError("Invalid JSON format. Please double-check your syntax.");
+      console.error("Failed to parse bulk JSON:", err);
+    }
+  };
+
   const handleAddBlog = async (e: React.FormEvent) => {
     e.preventDefault();
     setBlogFormSuccess(false);
@@ -177,6 +217,37 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const handleAddBulkBlogs = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBlogFormSuccess(false);
+    setBlogBulkError("");
+
+    try {
+      const parsed = JSON.parse(blogBulkJson);
+      if (!Array.isArray(parsed)) {
+        setBlogBulkError("Input must be a JSON array of blog post objects.");
+        return;
+      }
+
+      const res = await fetch("/api/blogs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(parsed)
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        setBlogFormSuccess(true);
+        setBlogBulkJson("");
+      } else {
+        setBlogBulkError(data.message || "Failed to upload bulk blogs.");
+      }
+    } catch (err: any) {
+      setBlogBulkError("Invalid JSON format. Please double-check your syntax.");
+      console.error("Failed to parse bulk JSON:", err);
+    }
+  };
+
   const handleAddCodingChallenge = async (e: React.FormEvent) => {
     e.preventDefault();
     setCodingSuccess(false);
@@ -208,6 +279,37 @@ export default function AdminDashboardPage() {
       }
     } catch (err) {
       console.error("Failed to post coding challenge:", err);
+    }
+  };
+
+  const handleAddBulkCoding = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCodingSuccess(false);
+    setCodingBulkError("");
+
+    try {
+      const parsed = JSON.parse(codingBulkJson);
+      if (!Array.isArray(parsed)) {
+        setCodingBulkError("Input must be a JSON array of coding challenge objects.");
+        return;
+      }
+
+      const res = await fetch("/api/challenges", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(parsed)
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        setCodingSuccess(true);
+        setCodingBulkJson("");
+      } else {
+        setCodingBulkError(data.message || "Failed to upload bulk challenges.");
+      }
+    } catch (err: any) {
+      setCodingBulkError("Invalid JSON format. Please double-check your syntax.");
+      console.error("Failed to parse bulk JSON:", err);
     }
   };
 
@@ -418,89 +520,157 @@ export default function AdminDashboardPage() {
           <div className="bg-glass border border-slate-800 rounded-xl p-6 max-w-2xl mx-auto">
             <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-6 flex items-center space-x-1.5">
               <PlusCircle className="h-5 w-5 text-brand-cyan" />
-              <span>Create New Preparation Card</span>
+              <span>Manage Preparation Cards</span>
             </h3>
 
             {formSuccess && (
               <div className="mb-4 rounded bg-emerald-500/10 border border-emerald-500/25 p-3 text-xs text-emerald-400">
-                New interview prep card successfully registered in database!
+                {uploadMode === "single" 
+                  ? "New interview prep card successfully registered in database!" 
+                  : "Batch of prep cards successfully imported into database!"}
               </div>
             )}
 
-            <form onSubmit={handleAddQuestion} className="space-y-4 text-xs">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-semibold text-slate-300 uppercase mb-1.5">Category</label>
-                  <select
-                    value={newCategory}
-                    onChange={(e) => setNewCategory(e.target.value)}
-                    className="w-full rounded bg-slate-950 border border-slate-800 p-2.5 text-slate-300 focus:outline-none"
-                  >
-                    <option>React</option>
-                    <option>React Native</option>
-                    <option>JavaScript</option>
-                    <option>TypeScript</option>
-                    <option>Next.js</option>
-                    <option>Node.js</option>
-                    <option>HR Interview</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block font-semibold text-slate-300 uppercase mb-1.5">Difficulty</label>
-                  <select
-                    value={newDifficulty}
-                    onChange={(e) => setNewDifficulty(e.target.value)}
-                    className="w-full rounded bg-slate-950 border border-slate-800 p-2.5 text-slate-300 focus:outline-none"
-                  >
-                    <option>easy</option>
-                    <option>medium</option>
-                    <option>hard</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block font-semibold text-slate-300 uppercase mb-1.5">Question statement</label>
-                <input
-                  type="text"
-                  required
-                  value={newQuestion}
-                  onChange={(e) => setNewQuestion(e.target.value)}
-                  placeholder="e.g. How does react rendering context bypass props trees?"
-                  className="w-full rounded bg-slate-950 border border-slate-800 px-3.5 py-2.5 text-white placeholder-slate-650 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block font-semibold text-slate-300 uppercase mb-1.5">Verified Best Answer</label>
-                <textarea
-                  required
-                  rows={4}
-                  value={newAnswer}
-                  onChange={(e) => setNewAnswer(e.target.value)}
-                  placeholder="Detailed breakdown formulas..."
-                  className="w-full rounded bg-slate-950 border border-slate-800 p-3.5 text-white placeholder-slate-650 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block font-semibold text-slate-300 uppercase mb-1.5">Tags (Comma-separated)</label>
-                <input
-                  type="text"
-                  value={newTags}
-                  onChange={(e) => setNewTags(e.target.value)}
-                  placeholder="React Hooks, Context, State"
-                  className="w-full rounded bg-slate-950 border border-slate-800 px-3.5 py-2.5 text-white placeholder-slate-650 focus:outline-none"
-                />
-              </div>
-
+            <div className="flex border-b border-slate-800 mb-6">
               <button
-                type="submit"
-                className="w-full rounded bg-brand-cyan hover:brightness-110 py-3 font-semibold text-white transition-all active:scale-95 shadow-lg"
+                type="button"
+                onClick={() => { setUploadMode("single"); setFormSuccess(false); setBulkError(""); }}
+                className={`flex-1 pb-3 text-xs font-semibold text-center transition-all border-b-2 ${
+                  uploadMode === "single"
+                    ? "border-brand-cyan text-white font-bold"
+                    : "border-transparent text-slate-500 hover:text-slate-300"
+                }`}
               >
-                Publish Question Card
+                Add Single Question
               </button>
-            </form>
+              <button
+                type="button"
+                onClick={() => { setUploadMode("bulk"); setFormSuccess(false); setBulkError(""); }}
+                className={`flex-1 pb-3 text-xs font-semibold text-center transition-all border-b-2 ${
+                  uploadMode === "bulk"
+                    ? "border-brand-cyan text-white font-bold"
+                    : "border-transparent text-slate-500 hover:text-slate-300"
+                }`}
+              >
+                Bulk Import (JSON)
+              </button>
+            </div>
+
+            {uploadMode === "single" ? (
+              <form onSubmit={handleAddQuestion} className="space-y-4 text-xs">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block font-semibold text-slate-300 uppercase mb-1.5">Category</label>
+                    <select
+                      value={newCategory}
+                      onChange={(e) => setNewCategory(e.target.value)}
+                      className="w-full rounded bg-slate-950 border border-slate-800 p-2.5 text-slate-300 focus:outline-none"
+                    >
+                      <option>React</option>
+                      <option>React Native</option>
+                      <option>JavaScript</option>
+                      <option>TypeScript</option>
+                      <option>Next.js</option>
+                      <option>Node.js</option>
+                      <option>HR Interview</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block font-semibold text-slate-300 uppercase mb-1.5">Difficulty</label>
+                    <select
+                      value={newDifficulty}
+                      onChange={(e) => setNewDifficulty(e.target.value)}
+                      className="w-full rounded bg-slate-950 border border-slate-800 p-2.5 text-slate-300 focus:outline-none"
+                    >
+                      <option>easy</option>
+                      <option>medium</option>
+                      <option>hard</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-slate-300 uppercase mb-1.5">Question statement</label>
+                  <input
+                    type="text"
+                    required
+                    value={newQuestion}
+                    onChange={(e) => setNewQuestion(e.target.value)}
+                    placeholder="e.g. How does react rendering context bypass props trees?"
+                    className="w-full rounded bg-slate-950 border border-slate-800 px-3.5 py-2.5 text-white placeholder-slate-650 focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-slate-300 uppercase mb-1.5">Verified Best Answer</label>
+                  <textarea
+                    required
+                    rows={4}
+                    value={newAnswer}
+                    onChange={(e) => setNewAnswer(e.target.value)}
+                    placeholder="Detailed breakdown formulas..."
+                    className="w-full rounded bg-slate-950 border border-slate-800 p-3.5 text-white placeholder-slate-650 focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-slate-300 uppercase mb-1.5">Tags (Comma-separated)</label>
+                  <input
+                    type="text"
+                    value={newTags}
+                    onChange={(e) => setNewTags(e.target.value)}
+                    placeholder="React Hooks, Context, State"
+                    className="w-full rounded bg-slate-950 border border-slate-800 px-3.5 py-2.5 text-white placeholder-slate-650 focus:outline-none"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full rounded bg-brand-cyan hover:brightness-110 py-3 font-semibold text-white transition-all active:scale-95 shadow-lg"
+                >
+                  Publish Question Card
+                </button>
+              </form>
+            ) : (
+              <form onSubmit={handleAddBulkQuestions} className="space-y-4 text-xs">
+                {bulkError && (
+                  <div className="mb-4 rounded bg-red-500/10 border border-red-500/25 p-3 text-xs text-red-400">
+                    {bulkError}
+                  </div>
+                )}
+
+                <div>
+                  <label className="block font-semibold text-slate-300 uppercase mb-1.5">Pasted JSON Array</label>
+                  <textarea
+                    required
+                    rows={12}
+                    value={bulkJson}
+                    onChange={(e) => setBulkJson(e.target.value)}
+                    placeholder={`[\n  {\n    "question": "What is the difference between state and props?",\n    "answer": "State is managed within the component, whereas props are read-only values passed down...",\n    "category": "React",\n    "difficulty": "easy",\n    "tags": ["React", "State", "Props"]\n  }\n]`}
+                    className="w-full rounded bg-slate-950 border border-slate-800 p-3.5 text-white placeholder-slate-650 focus:outline-none font-mono leading-relaxed"
+                  />
+                </div>
+
+                <div className="rounded-lg bg-slate-950/60 border border-slate-800/80 p-4 text-[11px] text-slate-450 leading-relaxed space-y-2">
+                  <span className="font-bold text-slate-200 block uppercase tracking-wider text-[10px]">Import Guide & Schema</span>
+                  <p>Each object in the pasted JSON array must include the following properties:</p>
+                  <ul className="list-disc list-inside pl-2 space-y-1 text-slate-400 text-[10px]">
+                    <li><strong className="text-white">question</strong> (string) — Title or description of the question.</li>
+                    <li><strong className="text-white">answer</strong> (string) — Explanation, code blocks, or solution description.</li>
+                    <li><strong className="text-white">category</strong> (string) — Exact matching category enum value (e.g. <code className="text-brand-cyan">React</code>, <code className="text-brand-cyan">JavaScript</code>, <code className="text-brand-cyan">TypeScript</code>, <code className="text-brand-cyan">Next.js</code>, <code className="text-brand-cyan">Node.js</code>, <code className="text-brand-cyan">HR Interview</code>).</li>
+                    <li><strong className="text-white">difficulty</strong> (string) — <code className="text-brand-cyan">easy</code>, <code className="text-brand-cyan">medium</code>, or <code className="text-brand-cyan">hard</code>.</li>
+                  </ul>
+                  <p className="text-[10px] text-slate-500 pt-1">Optional parameters: <code className="text-slate-400">tags</code> (array of strings), <code className="text-slate-400">example</code> (codeblock string), <code className="text-slate-400">faqs</code> (array of {`{ question, answer }`}).</p>
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full rounded bg-brand-cyan hover:brightness-110 py-3 font-semibold text-white transition-all active:scale-95 shadow-lg"
+                >
+                  Import Questions Batch
+                </button>
+              </form>
+            )}
           </div>
         )}
  
@@ -508,113 +678,184 @@ export default function AdminDashboardPage() {
           <div className="bg-glass border border-slate-800 rounded-xl p-6 max-w-2xl mx-auto">
             <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-6 flex items-center space-x-1.5">
               <PlusCircle className="h-5 w-5 text-brand-purple" />
-              <span>Publish New Blog Post</span>
+              <span>Manage Blog Posts</span>
             </h3>
 
             {blogFormSuccess && (
               <div className="mb-4 rounded bg-emerald-500/10 border border-emerald-500/25 p-3 text-xs text-emerald-400">
-                New blog post successfully published to the database!
+                {blogUploadMode === "single"
+                  ? "New blog post successfully published to the database!"
+                  : "Batch of blog posts successfully imported into database!"}
               </div>
             )}
 
-            <form onSubmit={handleAddBlog} className="space-y-4 text-xs">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-semibold text-slate-300 uppercase mb-1.5">Category</label>
-                  <select
-                    value={newBlogCategory}
-                    onChange={(e) => setNewBlogCategory(e.target.value)}
-                    className="w-full rounded bg-slate-950 border border-slate-800 p-2.5 text-slate-300 focus:outline-none"
-                  >
-                    <option>React</option>
-                    <option>React Native</option>
-                    <option>JavaScript</option>
-                    <option>TypeScript</option>
-                    <option>Next.js</option>
-                    <option>Career Growth</option>
-                    <option>Interview Preparation</option>
-                    <option>Resume Tips</option>
-                    <option>System Design</option>
-                    <option>AI Tools</option>
-                  </select>
+            <div className="flex border-b border-slate-800 mb-6">
+              <button
+                type="button"
+                onClick={() => { setBlogUploadMode("single"); setBlogFormSuccess(false); setBlogBulkError(""); }}
+                className={`flex-1 pb-3 text-xs font-semibold text-center transition-all border-b-2 ${
+                  blogUploadMode === "single"
+                    ? "border-brand-purple text-white font-bold"
+                    : "border-transparent text-slate-500 hover:text-slate-300"
+                }`}
+              >
+                Publish Single Blog
+              </button>
+              <button
+                type="button"
+                onClick={() => { setBlogUploadMode("bulk"); setBlogFormSuccess(false); setBlogBulkError(""); }}
+                className={`flex-1 pb-3 text-xs font-semibold text-center transition-all border-b-2 ${
+                  blogUploadMode === "bulk"
+                    ? "border-brand-purple text-white font-bold"
+                    : "border-transparent text-slate-500 hover:text-slate-300"
+                }`}
+              >
+                Bulk Import (JSON)
+              </button>
+            </div>
+
+            {blogUploadMode === "single" ? (
+              <form onSubmit={handleAddBlog} className="space-y-4 text-xs">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block font-semibold text-slate-300 uppercase mb-1.5">Category</label>
+                    <select
+                      value={newBlogCategory}
+                      onChange={(e) => setNewBlogCategory(e.target.value)}
+                      className="w-full rounded bg-slate-950 border border-slate-800 p-2.5 text-slate-300 focus:outline-none"
+                    >
+                      <option>React</option>
+                      <option>React Native</option>
+                      <option>JavaScript</option>
+                      <option>TypeScript</option>
+                      <option>Next.js</option>
+                      <option>Node.js</option>
+                      <option>Node.js / Backend</option>
+                      <option>MongoDB</option>
+                      <option>Career Growth</option>
+                      <option>Interview Preparation</option>
+                      <option>Interview Tips</option>
+                      <option>Resume Tips</option>
+                      <option>System Design</option>
+                      <option>AI Tools</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block font-semibold text-slate-300 uppercase mb-1.5">Author Name (Optional)</label>
+                    <input
+                      type="text"
+                      value={newBlogAuthorName}
+                      onChange={(e) => setNewBlogAuthorName(e.target.value)}
+                      placeholder="e.g. Alex Rivera"
+                      className="w-full rounded bg-slate-950 border border-slate-800 px-3.5 py-2.5 text-white placeholder-slate-650 focus:outline-none"
+                    />
+                  </div>
                 </div>
+
                 <div>
-                  <label className="block font-semibold text-slate-300 uppercase mb-1.5">Author Name (Optional)</label>
+                  <label className="block font-semibold text-slate-300 uppercase mb-1.5">Blog Title</label>
                   <input
                     type="text"
-                    value={newBlogAuthorName}
-                    onChange={(e) => setNewBlogAuthorName(e.target.value)}
-                    placeholder="e.g. Alex Rivera"
+                    required
+                    value={newBlogTitle}
+                    onChange={(e) => setNewBlogTitle(e.target.value)}
+                    placeholder="e.g. Mastering React 19: New Hooks & Compiler Features"
                     className="w-full rounded bg-slate-950 border border-slate-800 px-3.5 py-2.5 text-white placeholder-slate-650 focus:outline-none"
                   />
                 </div>
-              </div>
 
-              <div>
-                <label className="block font-semibold text-slate-300 uppercase mb-1.5">Blog Title</label>
-                <input
-                  type="text"
-                  required
-                  value={newBlogTitle}
-                  onChange={(e) => setNewBlogTitle(e.target.value)}
-                  placeholder="e.g. Mastering React 19: New Hooks & Compiler Features"
-                  className="w-full rounded bg-slate-950 border border-slate-800 px-3.5 py-2.5 text-white placeholder-slate-650 focus:outline-none"
-                />
-              </div>
+                <div>
+                  <label className="block font-semibold text-slate-300 uppercase mb-1.5">Summary (Short excerpt)</label>
+                  <input
+                    type="text"
+                    required
+                    value={newBlogSummary}
+                    onChange={(e) => setNewBlogSummary(e.target.value)}
+                    placeholder="e.g. Dive deep into React 19's brand new compiler features..."
+                    className="w-full rounded bg-slate-950 border border-slate-800 px-3.5 py-2.5 text-white placeholder-slate-650 focus:outline-none"
+                  />
+                </div>
 
-              <div>
-                <label className="block font-semibold text-slate-300 uppercase mb-1.5">Summary (Short excerpt)</label>
-                <input
-                  type="text"
-                  required
-                  value={newBlogSummary}
-                  onChange={(e) => setNewBlogSummary(e.target.value)}
-                  placeholder="e.g. Dive deep into React 19's brand new compiler features..."
-                  className="w-full rounded bg-slate-950 border border-slate-800 px-3.5 py-2.5 text-white placeholder-slate-650 focus:outline-none"
-                />
-              </div>
+                <div>
+                  <label className="block font-semibold text-slate-300 uppercase mb-1.5">Cover Image URL (Optional)</label>
+                  <input
+                    type="text"
+                    value={newBlogCoverImage}
+                    onChange={(e) => setNewBlogCoverImage(e.target.value)}
+                    placeholder="e.g. https://images.unsplash.com/..."
+                    className="w-full rounded bg-slate-950 border border-slate-800 px-3.5 py-2.5 text-white placeholder-slate-650 focus:outline-none"
+                  />
+                </div>
 
-              <div>
-                <label className="block font-semibold text-slate-300 uppercase mb-1.5">Cover Image URL (Optional)</label>
-                <input
-                  type="text"
-                  value={newBlogCoverImage}
-                  onChange={(e) => setNewBlogCoverImage(e.target.value)}
-                  placeholder="e.g. https://images.unsplash.com/..."
-                  className="w-full rounded bg-slate-950 border border-slate-800 px-3.5 py-2.5 text-white placeholder-slate-650 focus:outline-none"
-                />
-              </div>
+                <div>
+                  <label className="block font-semibold text-slate-300 uppercase mb-1.5">Content (Markdown format supported)</label>
+                  <textarea
+                    required
+                    rows={8}
+                    value={newBlogContent}
+                    onChange={(e) => setNewBlogContent(e.target.value)}
+                    placeholder="### Intro ... Write your body content in markdown ..."
+                    className="w-full rounded bg-slate-950 border border-slate-800 p-3.5 text-white placeholder-slate-650 focus:outline-none font-mono"
+                  />
+                </div>
 
-              <div>
-                <label className="block font-semibold text-slate-300 uppercase mb-1.5">Content (Markdown format supported)</label>
-                <textarea
-                  required
-                  rows={8}
-                  value={newBlogContent}
-                  onChange={(e) => setNewBlogContent(e.target.value)}
-                  placeholder="### Intro ... Write your body content in markdown ..."
-                  className="w-full rounded bg-slate-950 border border-slate-800 p-3.5 text-white placeholder-slate-650 focus:outline-none font-mono"
-                />
-              </div>
+                <div>
+                  <label className="block font-semibold text-slate-300 uppercase mb-1.5">Tags (Comma-separated)</label>
+                  <input
+                    type="text"
+                    value={newBlogTags}
+                    onChange={(e) => setNewBlogTags(e.target.value)}
+                    placeholder="React 19, Hooks, Web Dev"
+                    className="w-full rounded bg-slate-950 border border-slate-800 px-3.5 py-2.5 text-white placeholder-slate-650 focus:outline-none"
+                  />
+                </div>
 
-              <div>
-                <label className="block font-semibold text-slate-300 uppercase mb-1.5">Tags (Comma-separated)</label>
-                <input
-                  type="text"
-                  value={newBlogTags}
-                  onChange={(e) => setNewBlogTags(e.target.value)}
-                  placeholder="React 19, Hooks, Web Dev"
-                  className="w-full rounded bg-slate-950 border border-slate-800 px-3.5 py-2.5 text-white placeholder-slate-650 focus:outline-none"
-                />
-              </div>
+                <button
+                  type="submit"
+                  className="w-full rounded bg-brand-purple hover:brightness-110 py-3 font-semibold text-white transition-all active:scale-95 shadow-lg"
+                >
+                  Publish Blog Post
+                </button>
+              </form>
+            ) : (
+              <form onSubmit={handleAddBulkBlogs} className="space-y-4 text-xs">
+                {blogBulkError && (
+                  <div className="mb-4 rounded bg-red-500/10 border border-red-500/25 p-3 text-xs text-red-400">
+                    {blogBulkError}
+                  </div>
+                )}
 
-              <button
-                type="submit"
-                className="w-full rounded bg-brand-purple hover:brightness-110 py-3 font-semibold text-white transition-all active:scale-95 shadow-lg"
-              >
-                Publish Blog Post
-              </button>
-            </form>
+                <div>
+                  <label className="block font-semibold text-slate-300 uppercase mb-1.5">Pasted JSON Array</label>
+                  <textarea
+                    required
+                    rows={12}
+                    value={blogBulkJson}
+                    onChange={(e) => setBlogBulkJson(e.target.value)}
+                    placeholder={`[\n  {\n    "title": "Mastering Next.js 15 Server Components",\n    "summary": "Learn how next-gen React server models work...",\n    "content": "### Server Components Intro\\n\\nNext.js renders server components by default...",\n    "category": "Next.js",\n    "tags": ["Next.js", "React"]\n  }\n]`}
+                    className="w-full rounded bg-slate-950 border border-slate-800 p-3.5 text-white placeholder-slate-650 focus:outline-none font-mono leading-relaxed"
+                  />
+                </div>
+
+                <div className="rounded-lg bg-slate-950/60 border border-slate-800/80 p-4 text-[11px] text-slate-450 leading-relaxed space-y-2">
+                  <span className="font-bold text-slate-200 block uppercase tracking-wider text-[10px]">Import Guide & Schema</span>
+                  <p>Each object in the pasted JSON array must include the following properties:</p>
+                  <ul className="list-disc list-inside pl-2 space-y-1 text-slate-400 text-[10px]">
+                    <li><strong className="text-white">title</strong> (string) — Title of the blog post.</li>
+                    <li><strong className="text-white">content</strong> (string) — Markdown-formatted text content.</li>
+                    <li><strong className="text-white">category</strong> (string) — Matching category (e.g. <code className="text-brand-purple">React</code>, <code className="text-brand-purple">JavaScript</code>, <code className="text-brand-purple">Next.js</code>, <code className="text-brand-purple">System Design</code>, <code className="text-brand-purple">Node.js / Backend</code>).</li>
+                  </ul>
+                  <p className="text-[10px] text-slate-500 pt-1">Optional parameters: <code className="text-slate-400">summary</code> (string, defaults to first 150 chars), <code className="text-slate-400">coverImage</code> (string URL), <code className="text-slate-400">tags</code> (array of strings), <code className="text-slate-400">author</code> (object containing <code className="text-slate-400">name</code>, <code className="text-slate-400">image</code>, <code className="text-slate-400">bio</code>).</p>
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full rounded bg-brand-purple hover:brightness-110 py-3 font-semibold text-white transition-all active:scale-95 shadow-lg"
+                >
+                  Import Blogs Batch
+                </button>
+              </form>
+            )}
           </div>
         )}
 
@@ -622,173 +863,243 @@ export default function AdminDashboardPage() {
           <div className="bg-glass border border-slate-800 rounded-xl p-6 max-w-3xl mx-auto space-y-6 text-left">
             <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-6 flex items-center space-x-1.5">
               <PlusCircle className="h-5 w-5 text-brand-cyan" />
-              <span>Create New Coding Challenge</span>
+              <span>Manage Coding Challenges</span>
             </h3>
 
             {codingSuccess && (
               <div className="mb-4 rounded bg-emerald-500/10 border border-emerald-500/25 p-3 text-xs text-emerald-400">
-                New coding challenge successfully registered in the database!
+                {codingUploadMode === "single"
+                  ? "New coding challenge successfully registered in the database!"
+                  : "Batch of coding challenges successfully imported into database!"}
               </div>
             )}
 
-            <form onSubmit={handleAddCodingChallenge} className="space-y-4 text-xs">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-semibold text-slate-300 uppercase mb-1.5">Category</label>
-                  <select
-                    value={codingCategory}
-                    onChange={(e) => setCodingCategory(e.target.value)}
-                    className="w-full rounded bg-slate-950 border border-slate-800 p-2.5 text-slate-350 focus:outline-none"
-                  >
-                    <option>DSA</option>
-                    <option>JavaScript</option>
-                    <option>React</option>
-                    <option>Frontend</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block font-semibold text-slate-300 uppercase mb-1.5">Difficulty</label>
-                  <select
-                    value={codingDifficulty}
-                    onChange={(e) => setCodingDifficulty(e.target.value)}
-                    className="w-full rounded bg-slate-950 border border-slate-800 p-2.5 text-slate-350 focus:outline-none"
-                  >
-                    <option>easy</option>
-                    <option>medium</option>
-                    <option>hard</option>
-                  </select>
-                </div>
-              </div>
+            <div className="flex border-b border-slate-800 mb-6">
+              <button
+                type="button"
+                onClick={() => { setCodingUploadMode("single"); setCodingSuccess(false); setCodingBulkError(""); }}
+                className={`flex-1 pb-3 text-xs font-semibold text-center transition-all border-b-2 ${
+                  codingUploadMode === "single"
+                    ? "border-brand-cyan text-white font-bold"
+                    : "border-transparent text-slate-500 hover:text-slate-300"
+                }`}
+              >
+                Create Challenge Single
+              </button>
+              <button
+                type="button"
+                onClick={() => { setCodingUploadMode("bulk"); setCodingSuccess(false); setCodingBulkError(""); }}
+                className={`flex-1 pb-3 text-xs font-semibold text-center transition-all border-b-2 ${
+                  codingUploadMode === "bulk"
+                    ? "border-brand-cyan text-white font-bold"
+                    : "border-transparent text-slate-500 hover:text-slate-300"
+                }`}
+              >
+                Bulk Import (JSON)
+              </button>
+            </div>
 
-              <div className="grid grid-cols-2 gap-4">
+            {codingUploadMode === "single" ? (
+              <form onSubmit={handleAddCodingChallenge} className="space-y-4 text-xs">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block font-semibold text-slate-300 uppercase mb-1.5">Category</label>
+                    <select
+                      value={codingCategory}
+                      onChange={(e) => setCodingCategory(e.target.value)}
+                      className="w-full rounded bg-slate-950 border border-slate-800 p-2.5 text-slate-350 focus:outline-none"
+                    >
+                      <option>DSA</option>
+                      <option>JavaScript</option>
+                      <option>React</option>
+                      <option>Frontend</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block font-semibold text-slate-300 uppercase mb-1.5">Difficulty</label>
+                    <select
+                      value={codingDifficulty}
+                      onChange={(e) => setCodingDifficulty(e.target.value)}
+                      className="w-full rounded bg-slate-950 border border-slate-800 p-2.5 text-slate-350 focus:outline-none"
+                    >
+                      <option>easy</option>
+                      <option>medium</option>
+                      <option>hard</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block font-semibold text-slate-355 uppercase mb-1.5">Challenge Title</label>
+                    <input
+                      type="text"
+                      required
+                      value={codingTitle}
+                      onChange={(e) => setCodingTitle(e.target.value)}
+                      placeholder="e.g. Fizz Buzz"
+                      className="w-full rounded bg-slate-950 border border-slate-800 px-3.5 py-2.5 text-white placeholder-slate-650 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-semibold text-slate-355 uppercase mb-1.5">Compiler Function Name</label>
+                    <input
+                      type="text"
+                      required
+                      value={codingFuncName}
+                      onChange={(e) => setCodingFuncName(e.target.value)}
+                      placeholder="e.g. fizzBuzz"
+                      className="w-full rounded bg-slate-950 border border-slate-800 px-3.5 py-2.5 text-white placeholder-slate-650 focus:outline-none font-mono"
+                    />
+                  </div>
+                </div>
+
                 <div>
-                  <label className="block font-semibold text-slate-350 uppercase mb-1.5">Challenge Title</label>
+                  <label className="block font-semibold text-slate-355 uppercase mb-1.5">Problem Description (Markdown supported)</label>
+                  <textarea
+                    required
+                    rows={5}
+                    value={codingDesc}
+                    onChange={(e) => setCodingDesc(e.target.value)}
+                    placeholder="Describe constraints, inputs, expected output..."
+                    className="w-full rounded bg-slate-950 border border-slate-800 p-3.5 text-white placeholder-slate-650 focus:outline-none font-sans"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-slate-355 uppercase mb-1.5">Starter Boilerplate Code</label>
+                  <textarea
+                    required
+                    rows={5}
+                    value={codingStarter}
+                    onChange={(e) => setCodingStarter(e.target.value)}
+                    placeholder="function fizzBuzz(n) {\n  // write code\n}"
+                    className="w-full rounded bg-slate-950 border border-slate-800 p-3.5 text-white placeholder-slate-650 focus:outline-none font-mono"
+                  />
+                </div>
+
+                {/* Dynamic Test Cases section */}
+                <div className="space-y-3 pt-3 border-t border-slate-800/60">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-bold text-slate-300 uppercase tracking-wide">Test Cases</h4>
+                    <button
+                      type="button"
+                      onClick={addTestCase}
+                      className="rounded bg-brand-cyan/15 hover:bg-brand-cyan/20 border border-brand-cyan/30 px-3 py-1 text-[10px] font-bold text-brand-cyan transition-colors"
+                    >
+                      + Add Case
+                    </button>
+                  </div>
+
+                  <div className="space-y-3">
+                    {testCases.map((tc, idx) => (
+                      <div key={idx} className="p-4 bg-slate-950/40 border border-slate-800 rounded-lg flex flex-col md:flex-row gap-3 items-end">
+                        <div className="flex-1 space-y-1">
+                          <label className="text-[9px] font-semibold text-slate-500 uppercase">Input Params</label>
+                          <input
+                            type="text"
+                            required
+                            value={tc.input}
+                            onChange={(e) => handleTestCaseChange(idx, "input", e.target.value)}
+                            placeholder="e.g. [2, 7, 11], 9"
+                            className="w-full rounded bg-slate-950 border border-slate-850 px-2.5 py-1.5 text-xs text-white placeholder-slate-700 focus:outline-none font-mono"
+                          />
+                        </div>
+                        <div className="flex-1 space-y-1">
+                          <label className="text-[9px] font-semibold text-slate-500 uppercase">Expected Output (JS Format)</label>
+                          <input
+                            type="text"
+                            required
+                            value={tc.expectedOutput}
+                            onChange={(e) => handleTestCaseChange(idx, "expectedOutput", e.target.value)}
+                            placeholder="e.g. [0, 1]"
+                            className="w-full rounded bg-slate-950 border border-slate-850 px-2.5 py-1.5 text-xs text-white placeholder-slate-700 focus:outline-none font-mono"
+                          />
+                        </div>
+                        <div className="flex items-center space-x-2 pb-2">
+                          <input
+                            type="checkbox"
+                            id={`hide-${idx}`}
+                            checked={tc.isHidden}
+                            onChange={(e) => handleTestCaseChange(idx, "isHidden", e.target.checked)}
+                            className="rounded border-slate-805 bg-slate-950 text-brand-cyan focus:ring-0 focus:outline-none h-4 w-4 cursor-pointer"
+                          />
+                          <label htmlFor={`hide-${idx}`} className="text-[10px] text-slate-400 font-semibold cursor-pointer">Hidden Case</label>
+                        </div>
+                        {testCases.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeTestCase(idx)}
+                            className="rounded border border-red-500/20 bg-red-500/10 text-red-400 p-2 hover:bg-red-500/20 active:scale-95 transition-all mb-0.5"
+                          >
+                            <Trash2 className="h-4.5 w-4.5" />
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-slate-355 uppercase mb-1.5">Company Tags (Comma-separated)</label>
                   <input
                     type="text"
-                    required
-                    value={codingTitle}
-                    onChange={(e) => setCodingTitle(e.target.value)}
-                    placeholder="e.g. Fizz Buzz"
+                    value={codingTags}
+                    onChange={(e) => setCodingTags(e.target.value)}
+                    placeholder="e.g. Google, Apple, Amazon"
                     className="w-full rounded bg-slate-950 border border-slate-800 px-3.5 py-2.5 text-white placeholder-slate-650 focus:outline-none"
                   />
                 </div>
+
+                <button
+                  type="submit"
+                  className="w-full rounded bg-brand-cyan hover:brightness-110 py-3 font-semibold text-white transition-all active:scale-95 shadow-lg text-xs"
+                >
+                  Publish Challenge Sheet
+                </button>
+              </form>
+            ) : (
+              <form onSubmit={handleAddBulkCoding} className="space-y-4 text-xs">
+                {codingBulkError && (
+                  <div className="mb-4 rounded bg-red-500/10 border border-red-500/25 p-3 text-xs text-red-400">
+                    {codingBulkError}
+                  </div>
+                )}
+
                 <div>
-                  <label className="block font-semibold text-slate-350 uppercase mb-1.5">Compiler Function Name</label>
-                  <input
-                    type="text"
+                  <label className="block font-semibold text-slate-300 uppercase mb-1.5">Pasted JSON Array</label>
+                  <textarea
                     required
-                    value={codingFuncName}
-                    onChange={(e) => setCodingFuncName(e.target.value)}
-                    placeholder="e.g. fizzBuzz"
-                    className="w-full rounded bg-slate-950 border border-slate-800 px-3.5 py-2.5 text-white placeholder-slate-650 focus:outline-none font-mono"
+                    rows={12}
+                    value={codingBulkJson}
+                    onChange={(e) => setCodingBulkJson(e.target.value)}
+                    placeholder={`[\n  {\n    "title": "Reverse String",\n    "description": "Write a function that reverses a string...",\n    "difficulty": "easy",\n    "category": "DSA",\n    "starterCode": "function reverseString(s) {\\n  return s.split('').reverse().join('');\\n}",\n    "functionName": "reverseString",\n    "testCases": [\n      { "input": "'hello'", "expectedOutput": "'olleh'", "isHidden": false }\n    ],\n    "companyTags": ["Apple"]\n  }\n]`}
+                    className="w-full rounded bg-slate-950 border border-slate-800 p-3.5 text-white placeholder-slate-650 focus:outline-none font-mono leading-relaxed"
                   />
                 </div>
-              </div>
 
-              <div>
-                <label className="block font-semibold text-slate-350 uppercase mb-1.5">Problem Description (Markdown supported)</label>
-                <textarea
-                  required
-                  rows={5}
-                  value={codingDesc}
-                  onChange={(e) => setCodingDesc(e.target.value)}
-                  placeholder="Describe constraints, inputs, expected output..."
-                  className="w-full rounded bg-slate-950 border border-slate-800 p-3.5 text-white placeholder-slate-650 focus:outline-none font-sans"
-                />
-              </div>
-
-              <div>
-                <label className="block font-semibold text-slate-350 uppercase mb-1.5">Starter Boilerplate Code</label>
-                <textarea
-                  required
-                  rows={5}
-                  value={codingStarter}
-                  onChange={(e) => setCodingStarter(e.target.value)}
-                  placeholder="function fizzBuzz(n) {\n  // write code\n}"
-                  className="w-full rounded bg-slate-950 border border-slate-800 p-3.5 text-white placeholder-slate-650 focus:outline-none font-mono"
-                />
-              </div>
-
-              {/* Dynamic Test Cases section */}
-              <div className="space-y-3 pt-3 border-t border-slate-800/60">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-bold text-slate-300 uppercase tracking-wide">Test Cases</h4>
-                  <button
-                    type="button"
-                    onClick={addTestCase}
-                    className="rounded bg-brand-cyan/15 hover:bg-brand-cyan/20 border border-brand-cyan/30 px-3 py-1 text-[10px] font-bold text-brand-cyan transition-colors"
-                  >
-                    + Add Case
-                  </button>
+                <div className="rounded-lg bg-slate-950/60 border border-slate-800/80 p-4 text-[11px] text-slate-450 leading-relaxed space-y-2">
+                  <span className="font-bold text-slate-200 block uppercase tracking-wider text-[10px]">Import Guide & Schema</span>
+                  <p>Each object in the pasted JSON array must include the following properties:</p>
+                  <ul className="list-disc list-inside pl-2 space-y-1 text-slate-400 text-[10px]">
+                    <li><strong className="text-white">title</strong> (string) — Challenge title.</li>
+                    <li><strong className="text-white">description</strong> (string) — Detailed markdown description.</li>
+                    <li><strong className="text-white">category</strong> (string) — Matching category (e.g. <code className="text-brand-cyan">DSA</code>, <code className="text-brand-cyan">JavaScript</code>, <code className="text-brand-cyan">React</code>).</li>
+                    <li><strong className="text-white">starterCode</strong> (string) — Boilerplate JavaScript code.</li>
+                    <li><strong className="text-white">functionName</strong> (string) — Name of the runner function inside boilerplate.</li>
+                    <li><strong className="text-white">testCases</strong> (array) — List of case objects containing <code className="text-white">input</code> (string params), <code className="text-white">expectedOutput</code> (string JS value), and optional <code className="text-white">isHidden</code> (boolean).</li>
+                  </ul>
+                  <p className="text-[10px] text-slate-500 pt-1">Optional parameters: <code className="text-slate-400">difficulty</code> (string: easy/medium/hard), <code className="text-slate-400">companyTags</code> (array of strings).</p>
                 </div>
 
-                <div className="space-y-3">
-                  {testCases.map((tc, idx) => (
-                    <div key={idx} className="p-4 bg-slate-950/40 border border-slate-800 rounded-lg flex flex-col md:flex-row gap-3 items-end">
-                      <div className="flex-1 space-y-1">
-                        <label className="text-[9px] font-semibold text-slate-500 uppercase">Input Params</label>
-                        <input
-                          type="text"
-                          required
-                          value={tc.input}
-                          onChange={(e) => handleTestCaseChange(idx, "input", e.target.value)}
-                          placeholder="e.g. [2, 7, 11], 9"
-                          className="w-full rounded bg-slate-950 border border-slate-850 px-2.5 py-1.5 text-xs text-white placeholder-slate-700 focus:outline-none font-mono"
-                        />
-                      </div>
-                      <div className="flex-1 space-y-1">
-                        <label className="text-[9px] font-semibold text-slate-500 uppercase">Expected Output (JS Format)</label>
-                        <input
-                          type="text"
-                          required
-                          value={tc.expectedOutput}
-                          onChange={(e) => handleTestCaseChange(idx, "expectedOutput", e.target.value)}
-                          placeholder="e.g. [0, 1]"
-                          className="w-full rounded bg-slate-950 border border-slate-850 px-2.5 py-1.5 text-xs text-white placeholder-slate-700 focus:outline-none font-mono"
-                        />
-                      </div>
-                      <div className="flex items-center space-x-2 pb-2">
-                        <input
-                          type="checkbox"
-                          id={`hide-${idx}`}
-                          checked={tc.isHidden}
-                          onChange={(e) => handleTestCaseChange(idx, "isHidden", e.target.checked)}
-                          className="rounded border-slate-805 bg-slate-950 text-brand-cyan focus:ring-0 focus:outline-none h-4 w-4 cursor-pointer"
-                        />
-                        <label htmlFor={`hide-${idx}`} className="text-[10px] text-slate-400 font-semibold cursor-pointer">Hidden Case</label>
-                      </div>
-                      {testCases.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => removeTestCase(idx)}
-                          className="rounded border border-red-500/20 bg-red-500/10 text-red-400 p-2 hover:bg-red-500/20 active:scale-95 transition-all mb-0.5"
-                        >
-                          <Trash2 className="h-4.5 w-4.5" />
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block font-semibold text-slate-355 uppercase mb-1.5">Company Tags (Comma-separated)</label>
-                <input
-                  type="text"
-                  value={codingTags}
-                  onChange={(e) => setCodingTags(e.target.value)}
-                  placeholder="e.g. Google, Apple, Amazon"
-                  className="w-full rounded bg-slate-950 border border-slate-800 px-3.5 py-2.5 text-white placeholder-slate-650 focus:outline-none"
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full rounded bg-brand-cyan hover:brightness-110 py-3 font-semibold text-white transition-all active:scale-95 shadow-lg text-xs"
-              >
-                Publish Challenge Sheet
-              </button>
-            </form>
+                <button
+                  type="submit"
+                  className="w-full rounded bg-brand-cyan hover:brightness-110 py-3 font-semibold text-white transition-all active:scale-95 shadow-lg text-xs"
+                >
+                  Import Challenges Batch
+                </button>
+              </form>
+            )}
           </div>
         )}
 

@@ -139,30 +139,48 @@ export async function POST(req: Request) {
   try {
     await dbConnect();
     const body = await req.json();
-    const { title, description, difficulty, category, starterCode, functionName, testCases, companyTags } = body;
 
-    if (!title || !description || !category || !starterCode || !functionName || !testCases) {
-      return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
+    const formatChallenge = (data: any) => {
+      const { title, description, difficulty, category, starterCode, functionName, testCases, companyTags } = data;
+
+      if (!title || !description || !category || !starterCode || !functionName || !testCases) {
+        throw new Error(`Missing required fields (title, description, category, starterCode, functionName, or testCases) for: "${title || 'Unknown'}"`);
+      }
+
+      const slug = title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)+/g, "");
+
+      return {
+        title,
+        slug,
+        description,
+        difficulty: difficulty || "medium",
+        category,
+        starterCode,
+        functionName,
+        testCases: Array.isArray(testCases) ? testCases : [],
+        companyTags: Array.isArray(companyTags) ? companyTags : []
+      };
+    };
+
+    if (Array.isArray(body)) {
+      if (body.length === 0) {
+        return NextResponse.json({ message: "Empty challenges array provided" }, { status: 400 });
+      }
+      const preparedChallenges = body.map((item: any) => formatChallenge(item));
+      const newChallenges = await Challenge.insertMany(preparedChallenges);
+      return NextResponse.json({
+        message: `Successfully inserted ${newChallenges.length} coding challenges`,
+        insertedCount: newChallenges.length,
+        data: newChallenges
+      }, { status: 201 });
+    } else {
+      const prepared = formatChallenge(body);
+      const newChallenge = await Challenge.create(prepared);
+      return NextResponse.json(newChallenge, { status: 201 });
     }
-
-    const slug = title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)+/g, "");
-
-    const newChallenge = await Challenge.create({
-      title,
-      slug,
-      description,
-      difficulty: difficulty || "medium",
-      category,
-      starterCode,
-      functionName,
-      testCases: Array.isArray(testCases) ? testCases : [],
-      companyTags: Array.isArray(companyTags) ? companyTags : []
-    });
-
-    return NextResponse.json(newChallenge, { status: 201 });
   } catch (error: any) {
     console.error("Challenges POST API error:", error);
     return NextResponse.json({ message: error.message || "Internal Server Error" }, { status: 500 });

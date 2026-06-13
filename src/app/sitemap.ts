@@ -2,6 +2,7 @@ import { MetadataRoute } from "next";
 import { dbConnect } from "@/lib/db";
 import Question from "@/models/Question";
 import Blog from "@/models/Blog";
+import Challenge from "@/models/Challenge";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://interviewsaceai.online";
@@ -32,6 +33,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   let questionPaths: MetadataRoute.Sitemap = [];
   let blogPaths: MetadataRoute.Sitemap = [];
+  let challengePaths: MetadataRoute.Sitemap = [];
 
   try {
     await dbConnect();
@@ -56,9 +58,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly",
       priority: 0.7,
     }));
+
+    // Query active coding challenges
+    const challenges = await Challenge.find({}).select("slug updatedAt").lean();
+    challengePaths = challenges.map((c: any) => ({
+      url: `${baseUrl}/coding/${c.slug}`,
+      lastModified: new Date(c.updatedAt || Date.now()),
+      changeFrequency: "weekly",
+      priority: 0.7,
+    }));
   } catch (error) {
     console.error("Failed to read database entries for dynamic sitemap gen:", error);
   }
 
-  return [...staticPaths, ...categoryPaths, ...questionPaths, ...blogPaths];
+  return [...staticPaths, ...categoryPaths, ...questionPaths, ...blogPaths, ...challengePaths];
 }

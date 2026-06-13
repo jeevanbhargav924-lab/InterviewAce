@@ -20,41 +20,41 @@ export default function TermsAndConditionsPage() {
 
         <section className="space-y-6 text-sm">
           <p>
-            Welcome to <strong>InterviewsAceAI.online</strong>. These terms and conditions outline the rules and regulations for the use of InterviewsAceAI.online's Website, located at <a href="https://interviewsaceai.online" className="text-brand-cyan hover:underline">https://interviewsaceai.online</a>.
+            Welcome to <strong>InterviewAceAI.online</strong>. These terms and conditions outline the rules and regulations for the use of InterviewAceAI.online's Website, located at <a href="https://interviewaceai.online" className="text-brand-cyan hover:underline">https://interviewaceai.online</a>.
           </p>
 
           <div>
             <h2 className="text-lg font-bold text-white mb-2">1. Terms</h2>
             <p>
-              By accessing this website, we assume you accept these terms and conditions. Do not continue to use InterviewsAceAI.online if you do not agree to take all of the terms and conditions stated on this page.
+              By accessing this website, we assume you accept these terms and conditions. Do not continue to use InterviewAceAI.online if you do not agree to take all of the terms and conditions stated on this page.
             </p>
           </div>
 
           <div>
             <h2 className="text-lg font-bold text-white mb-2">2. Cookies</h2>
             <p>
-              We employ the use of cookies. By accessing InterviewsAceAI.online, you agreed to use cookies in agreement with the InterviewsAceAI.online's Privacy Policy. Most interactive websites use cookies to let us retrieve the user's details for each visit. Cookies are used by our website to enable the functionality of certain areas to make it easier for people visiting our website.
+              We employ the use of cookies. By accessing InterviewAceAI.online, you agreed to use cookies in agreement with the InterviewAceAI.online's Privacy Policy. Most interactive websites use cookies to let us retrieve the user's details for each visit. Cookies are used by our website to enable the functionality of certain areas to make it easier for people visiting our website.
             </p>
           </div>
 
           <div>
             <h2 className="text-lg font-bold text-white mb-2">3. License & Intellectual Property</h2>
             <p>
-              Unless otherwise stated, InterviewsAceAI.online and/or its licensors own the intellectual property rights for all material on InterviewsAceAI.online. All intellectual property rights are reserved. You may access this from InterviewsAceAI.online for your own personal use subjected to restrictions set in these terms and conditions.
+              Unless otherwise stated, InterviewAceAI.online and/or its licensors own the intellectual property rights for all material on InterviewAceAI.online. All intellectual property rights are reserved. You may access this from InterviewAceAI.online for your own personal use subjected to restrictions set in these terms and conditions.
             </p>
             <p className="mt-2">You must not:</p>
             <ul className="list-disc pl-5 space-y-1 mt-1">
-              <li>Republish material from InterviewsAceAI.online.</li>
-              <li>Sell, rent, or sub-license material from InterviewsAceAI.online.</li>
-              <li>Reproduce, duplicate, or copy material from InterviewsAceAI.online.</li>
-              <li>Redistribute content from InterviewsAceAI.online.</li>
+              <li>Republish material from InterviewAceAI.online.</li>
+              <li>Sell, rent, or sub-license material from InterviewAceAI.online.</li>
+              <li>Reproduce, duplicate, or copy material from InterviewAceAI.online.</li>
+              <li>Redistribute content from InterviewAceAI.online.</li>
             </ul>
           </div>
 
           <div>
             <h2 className="text-lg font-bold text-white mb-2">4. User Comments & Simulators</h2>
             <p>
-              Parts of this website offer an opportunity for users to post and exchange opinions and data in certain areas of the website (e.g. blog comments, interview responses). Comments do not reflect the views and opinions of InterviewsAceAI.online, its agents and/or affiliates. To the extent permitted by applicable laws, InterviewsAceAI.online shall not be liable for the Comments or for any liability, damages, or expenses caused and/or suffered as a result of any use of and/or posting of and/or appearance of the Comments on this website.
+              Parts of this website offer an opportunity for users to post and exchange opinions and data in certain areas of the website (e.g. blog comments, interview responses). Comments do not reflect the views and opinions of InterviewAceAI.online, its agents and/or affiliates. To the extent permitted by applicable laws, InterviewAceAI.online shall not be liable for the Comments or for any liability, damages, or expenses caused and/or suffered as a result of any use of and/or posting of and/or appearance of the Comments on this website.
             </p>
           </div>
 

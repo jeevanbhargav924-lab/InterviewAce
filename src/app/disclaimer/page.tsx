@@ -20,13 +20,13 @@ export default function DisclaimerPage() {
 
         <section className="space-y-6 text-sm">
           <p>
-            The information contained on the <strong>InterviewsAceAI.online</strong> website (the "Service") is for general informational and educational purposes only.
+            The information contained on the <strong>InterviewAceAI.online</strong> website (the "Service") is for general informational and educational purposes only.
           </p>
 
           <div>
             <h2 className="text-lg font-bold text-white mb-2">1. Educational Scope</h2>
             <p>
-              InterviewsAceAI.online provides questions, sample answers, code blocks, and blog guidelines as a study reference. While we make every effort to keep our databases updated and correct, we make no representations or warranties of any kind, express or implied, about the completeness, accuracy, reliability, suitability, or availability of the information contained on the Service for any purpose.
+              InterviewAceAI.online provides questions, sample answers, code blocks, and blog guidelines as a study reference. While we make every effort to keep our databases updated and correct, we make no representations or warranties of any kind, express or implied, about the completeness, accuracy, reliability, suitability, or availability of the information contained on the Service for any purpose.
             </p>
           </div>
 
@@ -40,14 +40,14 @@ export default function DisclaimerPage() {
           <div>
             <h2 className="text-lg font-bold text-white mb-2">3. External Links Disclaimer</h2>
             <p>
-              The Service may contain links to external websites that are not provided or maintained by or in any way affiliated with InterviewsAceAI.online. Please note that we do not guarantee the accuracy, relevance, timeliness, or completeness of any information on these external websites.
+              The Service may contain links to external websites that are not provided or maintained by or in any way affiliated with InterviewAceAI.online. Please note that we do not guarantee the accuracy, relevance, timeliness, or completeness of any information on these external websites.
             </p>
           </div>
 
           <div>
             <h2 className="text-lg font-bold text-white mb-2">4. Errors and Omissions</h2>
             <p>
-              The Service may include technical inaccuracies or typographical errors. InterviewsAceAI.online reserves the right to make additions, deletions, or modifications to the contents on the Service at any time without prior notice.
+              The Service may include technical inaccuracies or typographical errors. InterviewAceAI.online reserves the right to make additions, deletions, or modifications to the contents on the Service at any time without prior notice.
             </p>
           </div>
 

@@ -29,17 +29,17 @@ export async function generateMetadata({ params }: QuestionPageProps): Promise<M
     }
 
     if (!qDoc) {
-      return { title: "Question Not Found | InterviewsAceAI" };
+      return { title: "Question Not Found | InterviewAceAI" };
     }
     return {
-      title: `${qDoc.question} - ${qDoc.category} Interview Answer | InterviewsAceAI`,
+      title: `${qDoc.question} - ${qDoc.category} Interview Answer | InterviewAceAI`,
       description: `Detailed technical response, code examples, and explanation sheet for: ${qDoc.question}`,
       alternates: {
-        canonical: `https://interviewsaceai.online/questions/${category}/${slug}`
+        canonical: `https://interviewaceai.online/questions/${category}/${slug}`
       }
     };
   } catch (e) {
-    return { title: "Technical Interview Question | InterviewsAceAI" };
+    return { title: "Technical Interview Question | InterviewAceAI" };
   }
 }
 
@@ -98,19 +98,19 @@ export default async function QuestionDetailPage({ params }: QuestionPageProps) 
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": "https://interviewsaceai.online"
+        "item": "https://interviewaceai.online"
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": `${catLabel} Questions`,
-        "item": `https://interviewsaceai.online/questions/${category}`
+        "item": `https://interviewaceai.online/questions/${category}`
       },
       {
         "@type": "ListItem",
         "position": 3,
         "name": qDoc.question,
-        "item": `https://interviewsaceai.online/questions/${category}/${slug}`
+        "item": `https://interviewaceai.online/questions/${category}/${slug}`
       }
     ]
   };

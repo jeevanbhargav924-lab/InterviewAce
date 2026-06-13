@@ -298,7 +298,7 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
             <span><kbd className="bg-slate-800 border border-slate-700 rounded px-1">esc</kbd> close</span>
             <span><kbd className="bg-slate-800 border border-slate-700 rounded px-1">↵</kbd> select</span>
           </div>
-          <span>InterviewsAceAI.online</span>
+          <span>InterviewAceAI.online</span>
         </div>
 
       </div>

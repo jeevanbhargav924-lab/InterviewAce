@@ -128,7 +128,7 @@ export default function Footer() {
 
         {/* Legal bottom row */}
         <div className="mt-8 pt-8 border-t border-slate-800/60 flex flex-col md:flex-row items-center justify-between text-xs text-slate-600">
-          <p>© {currentYear} InterviewsAceAI.online. All rights reserved.</p>
+          <p>© {currentYear} InterviewAceAI.online. All rights reserved.</p>
           <div className="flex space-x-4 mt-4 md:mt-0">
             <Link href="/privacy-policy" className="hover:underline">Privacy Policy</Link>
             <Link href="/terms-and-conditions" className="hover:underline">Terms of Service</Link>

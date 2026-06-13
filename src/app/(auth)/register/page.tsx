@@ -4,6 +4,8 @@ import React, { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
+import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from "firebase/auth";
+import { auth } from "@/lib/firebase";
 import { ShieldCheck, User, Mail, Lock, ArrowRight, Sparkles } from "lucide-react";
 
 function RegisterForm() {
@@ -23,7 +25,16 @@ function RegisterForm() {
     setLoading(true);
 
     try {
-      // 1. Create account
+      // 1. Create account in Firebase Auth client-side
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      
+      // 2. Set profile display name
+      await updateProfile(userCredential.user, { displayName: name });
+      
+      // 3. Send email verification link
+      await sendEmailVerification(userCredential.user);
+
+      // 4. Create database record locally in MongoDB
       const registerRes = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -31,43 +42,21 @@ function RegisterForm() {
       });
 
       const data = await registerRes.json();
-
       if (!registerRes.ok) {
-        throw new Error(data.message || "Something went wrong.");
+        console.warn("MongoDB record sync warning:", data.message);
       }
 
-      // 2. Auto sign-in
-      const signInResult = await signIn("credentials", {
-        redirect: false,
-        email,
-        password,
-      });
-
-      if (signInResult?.error) {
-        setError("Account created, but automatic sign-in failed. Please log in manually.");
-        setLoading(false);
-        return;
-      }
-
-      // 3. Handle Premium redirect or standard redirect
-      if (targetPlan === "premium") {
-        // Upgrade mock/real checkout
-        const checkoutRes = await fetch("/api/checkout", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ simulatedSuccess: true }), // Simulated direct activation for demo speed!
-        });
-        const checkoutData = await checkoutRes.json();
-        
-        router.refresh();
-        router.push("/dashboard?checkout=success");
-      } else {
-        router.refresh();
-        router.push("/dashboard");
-      }
+      // Redirect to verify-email route to handle email verification flow
+      router.push(`/verify-email?email=${encodeURIComponent(email)}&plan=${targetPlan}`);
 
     } catch (err: any) {
-      setError(err.message || "An error occurred during account creation.");
+      let friendlyError = err.message || "An error occurred during account creation.";
+      if (err.code === "auth/email-already-in-use") {
+        friendlyError = "An account with this email address already exists in Firebase Auth.";
+      } else if (err.code === "auth/weak-password") {
+        friendlyError = "The password is too weak. Please use at least 6 characters.";
+      }
+      setError(friendlyError);
       setLoading(false);
     }
   };

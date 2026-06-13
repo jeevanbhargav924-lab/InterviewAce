@@ -16,13 +16,68 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
+        idToken: { label: "ID Token", type: "text" },
       },
       async authorize(credentials) {
+        const firebaseApiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
+        if (!firebaseApiKey) {
+          throw new Error("Firebase API key is not configured.");
+        }
+
+        // Mode A: Authenticate with Firebase Auth ID Token (automatic verified login)
+        if (credentials?.idToken) {
+          const lookupRes = await fetch(
+            `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${firebaseApiKey}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ idToken: credentials.idToken }),
+            }
+          );
+
+          const lookupData = await lookupRes.json();
+          if (!lookupRes.ok || !lookupData.users?.[0]) {
+            throw new Error("Failed to verify user session token.");
+          }
+
+          const firebaseUser = lookupData.users[0];
+
+          if (!firebaseUser.emailVerified) {
+            throw new Error("EMAIL_NOT_VERIFIED: Please verify your email address first.");
+          }
+
+          await dbConnect();
+          let user = await User.findOne({ email: firebaseUser.email.toLowerCase() });
+
+          if (!user) {
+            user = await User.create({
+              name: firebaseUser.displayName || firebaseUser.email.split("@")[0],
+              email: firebaseUser.email.toLowerCase(),
+              role: "user",
+              subscription: {
+                plan: "free",
+                status: "inactive",
+                expiresAt: null,
+              },
+            });
+          }
+
+          return {
+            id: user._id.toString(),
+            name: user.name,
+            email: user.email,
+            image: user.image,
+            role: user.role,
+            subscription: user.subscription,
+          };
+        }
+
+        // Mode B: Authenticate with Email and Password
         if (!credentials?.email || !credentials?.password) {
           throw new Error("Please enter your email and password.");
         }
 
-        const adminEmail = "admin@interviewsaceai.online";
+        const adminEmail = "admin@interviewaceai.online";
         const adminPassword = "AdminSecurePassword2026!";
         if (credentials.email.toLowerCase() === adminEmail && credentials.password === adminPassword) {
           return {
@@ -37,18 +92,66 @@ export const authOptions: NextAuthOptions = {
           };
         }
 
-        await dbConnect();
+        const signInRes = await fetch(
+          `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${firebaseApiKey}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: credentials.email.toLowerCase(),
+              password: credentials.password,
+              returnSecureToken: true,
+            }),
+          }
+        );
 
-        const user = await User.findOne({ email: credentials.email.toLowerCase() });
-
-        if (!user || !user.password) {
-          throw new Error("No user found with this email.");
+        const signInData = await signInRes.json();
+        if (!signInRes.ok) {
+          const errMsg = signInData.error?.message;
+          if (errMsg === "INVALID_PASSWORD" || errMsg === "EMAIL_NOT_FOUND" || errMsg === "INVALID_LOGIN_CREDENTIALS") {
+            throw new Error("Incorrect email address or password.");
+          }
+          throw new Error(errMsg || "Authentication failed.");
         }
 
-        const isValid = await bcrypt.compare(credentials.password, user.password);
+        const idToken = signInData.idToken;
 
-        if (!isValid) {
-          throw new Error("Incorrect password.");
+        // 2. Fetch user detail from Firebase to check if email is verified
+        const lookupRes = await fetch(
+          `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${firebaseApiKey}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ idToken }),
+          }
+        );
+
+        const lookupData = await lookupRes.json();
+        if (!lookupRes.ok || !lookupData.users?.[0]) {
+          throw new Error("Failed to load Firebase user profile details.");
+        }
+
+        const firebaseUser = lookupData.users[0];
+
+        if (!firebaseUser.emailVerified) {
+          throw new Error("EMAIL_NOT_VERIFIED: Please check your inbox and verify your email first.");
+        }
+
+        // 3. Connect to MongoDB and fetch or synchronize local user database record
+        await dbConnect();
+        let user = await User.findOne({ email: credentials.email.toLowerCase() });
+
+        if (!user) {
+          user = await User.create({
+            name: firebaseUser.displayName || credentials.email.split("@")[0],
+            email: credentials.email.toLowerCase(),
+            role: "user",
+            subscription: {
+              plan: "free",
+              status: "inactive",
+              expiresAt: null,
+            },
+          });
         }
 
         return {

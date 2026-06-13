@@ -20,7 +20,7 @@ export default function PrivacyPolicyPage() {
 
         <section className="space-y-6 text-sm">
           <p>
-            At <strong>InterviewsAceAI.online</strong> (accessible from <a href="https://interviewsaceai.online" className="text-brand-cyan hover:underline">https://interviewsaceai.online</a>), one of our main priorities is the privacy of our visitors. This Privacy Policy document contains types of information that is collected and recorded by InterviewsAceAI.online and how we use it.
+            At <strong>InterviewAceAI.online</strong> (accessible from <a href="https://interviewaceai.online" className="text-brand-cyan hover:underline">https://interviewaceai.online</a>), one of our main priorities is the privacy of our visitors. This Privacy Policy document contains types of information that is collected and recorded by InterviewAceAI.online and how we use it.
           </p>
 
           <div>
@@ -58,7 +58,7 @@ export default function PrivacyPolicyPage() {
           <div>
             <h2 className="text-lg font-bold text-white mb-2">4. Log Files and Web Analytics</h2>
             <p>
-              InterviewsAceAI.online follows a standard procedure of using log files. These files log visitors when they visit websites. The information collected by log files includes internet protocol (IP) addresses, browser type, Internet Service Provider (ISP), date and time stamp, referring/exit pages, and possibly the number of clicks. These are not linked to any information that is personally identifiable. The purpose of the information is for analyzing trends, administering the site, tracking users' movement on the website, and gathering demographic information.
+              InterviewAceAI.online follows a standard procedure of using log files. These files log visitors when they visit websites. The information collected by log files includes internet protocol (IP) addresses, browser type, Internet Service Provider (ISP), date and time stamp, referring/exit pages, and possibly the number of clicks. These are not linked to any information that is personally identifiable. The purpose of the information is for analyzing trends, administering the site, tracking users' movement on the website, and gathering demographic information.
             </p>
           </div>
 
@@ -72,10 +72,10 @@ export default function PrivacyPolicyPage() {
           <div>
             <h2 className="text-lg font-bold text-white mb-2">6. Privacy Policies of Advertising Partners</h2>
             <p>
-              Third-party ad servers or ad networks use technologies like cookies, JavaScript, or Web Beacons that are used in their respective advertisements and links that appear on InterviewsAceAI.online, which are sent directly to users' browsers. They automatically receive your IP address when this occurs. These technologies are used to measure the effectiveness of their advertising campaigns and/or to personalize the advertising content that you see on websites that you visit.
+              Third-party ad servers or ad networks use technologies like cookies, JavaScript, or Web Beacons that are used in their respective advertisements and links that appear on InterviewAceAI.online, which are sent directly to users' browsers. They automatically receive your IP address when this occurs. These technologies are used to measure the effectiveness of their advertising campaigns and/or to personalize the advertising content that you see on websites that you visit.
             </p>
             <p className="mt-2 text-slate-400 text-xs">
-              Note that InterviewsAceAI.online has no access to or control over these cookies that are used by third-party advertisers.
+              Note that InterviewAceAI.online has no access to or control over these cookies that are used by third-party advertisers.
             </p>
           </div>
 

@@ -4,19 +4,35 @@ import React, { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { ShieldCheck, Mail, Lock, ArrowRight } from "lucide-react";
+import { signInWithEmailAndPassword, sendEmailVerification, signOut as firebaseSignOut } from "firebase/auth";
+import { auth } from "@/lib/firebase";
+import { ShieldCheck, Mail, Lock, ArrowRight, RefreshCw } from "lucide-react";
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  const registered = searchParams.get("registered");
+  const registeredEmail = searchParams.get("email") || "";
+  const targetPlan = searchParams.get("plan") || "free";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [resendSuccess, setResendSuccess] = useState("");
+  const [showResendBtn, setShowResendBtn] = useState(false);
 
   const errorParam = searchParams.get("error");
+
+  React.useEffect(() => {
+    if (registered === "success") {
+      setSuccessMessage(`Account created! A verification link has been sent to ${registeredEmail}. Please check your inbox and verify your email before logging in.`);
+      setEmail(registeredEmail);
+    }
+  }, [registered, registeredEmail]);
 
   React.useEffect(() => {
     if (errorParam) {
@@ -33,7 +49,10 @@ function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setSuccessMessage("");
+    setResendSuccess("");
     setLoading(true);
+    setShowResendBtn(false);
 
     try {
       const result = await signIn("credentials", {
@@ -43,15 +62,52 @@ function LoginForm() {
       });
 
       if (result?.error) {
-        setError(result.error);
+        let cleanErr = result.error;
+        if (cleanErr.includes("EMAIL_NOT_VERIFIED:") || cleanErr.includes("verify your email first")) {
+          cleanErr = "Please check your inbox and verify your email address before logging in.";
+          setShowResendBtn(true);
+        }
+        setError(cleanErr);
       } else {
         router.refresh();
-        router.push(callbackUrl);
+        if (targetPlan === "premium") {
+          // Trigger simulated direct checkout activation for premium signup flow
+          await fetch("/api/checkout", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ simulatedSuccess: true }),
+          });
+          router.push("/dashboard?checkout=success");
+        } else {
+          router.push(callbackUrl);
+        }
       }
     } catch (err: any) {
       setError("An unexpected authentication error occurred.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    setError("");
+    setResendSuccess("");
+    setResending(true);
+    try {
+      // Temporarily login client-side to grab current user state
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      await sendEmailVerification(userCredential.user);
+      setResendSuccess("Verification email has been re-sent successfully! Please check your inbox.");
+      await firebaseSignOut(auth);
+      setShowResendBtn(false);
+    } catch (err: any) {
+      let friendlyError = err.message || "Failed to resend verification email.";
+      if (err.code === "auth/invalid-credential") {
+        friendlyError = "Incorrect password. Please enter your password to resend the verification email.";
+      }
+      setError(friendlyError);
+    } finally {
+      setResending(false);
     }
   };
 
@@ -89,9 +145,32 @@ function LoginForm() {
           <p className="text-xs text-slate-400 mt-1">Sign in to resume mock interviews and resume reviews.</p>
         </div>
 
+        {successMessage && (
+          <div className="mb-4 rounded bg-emerald-500/10 border border-emerald-500/25 p-3 text-xs text-emerald-400 leading-relaxed">
+            {successMessage}
+          </div>
+        )}
+
+        {resendSuccess && (
+          <div className="mb-4 rounded bg-emerald-500/10 border border-emerald-500/25 p-3 text-xs text-emerald-400 leading-relaxed">
+            {resendSuccess}
+          </div>
+        )}
+
         {error && (
-          <div className="mb-4 rounded bg-red-500/10 border border-red-500/25 p-3 text-xs text-red-400">
-            {error}
+          <div className="mb-4 rounded bg-red-500/10 border border-red-500/25 p-3 text-xs text-red-400 leading-relaxed flex flex-col gap-2">
+            <span>{error}</span>
+            {showResendBtn && (
+              <button
+                type="button"
+                onClick={handleResendVerification}
+                disabled={resending}
+                className="mt-1 flex items-center justify-center space-x-1 text-[10px] font-bold text-brand-cyan hover:underline self-start disabled:opacity-50"
+              >
+                {resending ? <RefreshCw className="h-3 w-3 animate-spin" /> : null}
+                <span>{resending ? "Resending link..." : "Resend Verification Email"}</span>
+              </button>
+            )}
           </div>
         )}
 

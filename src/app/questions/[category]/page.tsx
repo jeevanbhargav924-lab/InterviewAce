@@ -76,10 +76,10 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   const info = CATEGORY_MAP[catKey] || { name: resolvedParams.category, intro: "" };
   
   return {
-    title: `${info.name} Interview Questions & Preparation Guides | InterviewsAceAI`,
+    title: `${info.name} Interview Questions & Preparation Guides | InterviewAceAI`,
     description: info.intro || `Master technical ${info.name} interview questions, study guides, and mock preparation materials.`,
     alternates: {
-      canonical: `https://interviewsaceai.online/questions/${resolvedParams.category.toLowerCase()}`
+      canonical: `https://interviewaceai.online/questions/${resolvedParams.category.toLowerCase()}`
     }
   };
 }
@@ -124,14 +124,14 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     "@type": "CollectionPage",
     "name": `${info.name} Interview Questions & Preparation Guides`,
     "description": info.intro,
-    "url": `https://interviewsaceai.online/questions/${catKey}`,
+    "url": `https://interviewaceai.online/questions/${catKey}`,
     "mainEntity": {
       "@type": "ItemList",
       "numberOfItems": questions.length,
       "itemListElement": questions.map((q: any, idx) => ({
         "@type": "ListItem",
         "position": idx + 1,
-        "url": `https://interviewsaceai.online/questions/${catKey}/${q.slug}`
+        "url": `https://interviewaceai.online/questions/${catKey}/${q.slug}`
       }))
     }
   };

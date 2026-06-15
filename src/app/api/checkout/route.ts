@@ -21,6 +21,12 @@ export async function POST(req: Request) {
 
     // Check if user is trying to simulate upgrade directly (e.g. mock checkouts)
     if (simulatedSuccess) {
+      if (process.env.NODE_ENV !== "development") {
+        return NextResponse.json(
+          { message: "Simulated checkouts are not allowed in production." },
+          { status: 403 }
+        );
+      }
       const updatedUser = await User.findByIdAndUpdate(
         userId,
         {

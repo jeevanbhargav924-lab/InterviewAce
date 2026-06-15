@@ -40,33 +40,39 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // Query active questions
     const questions = await Question.find({}).select("category slug updatedAt").lean();
-    questionPaths = questions.map((q: any) => {
-      const formattedCategory = q.category.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-      return {
-        url: `${baseUrl}/questions/${formattedCategory}/${q.slug}`,
-        lastModified: new Date(q.updatedAt || Date.now()),
-        changeFrequency: "weekly",
-        priority: 0.7,
-      };
-    });
+    questionPaths = questions
+      .filter((q: any) => q && q.slug)
+      .map((q: any) => {
+        const formattedCategory = (q.category || "general").toLowerCase().replace(/[^a-z0-9]+/g, "-");
+        return {
+          url: `${baseUrl}/questions/${formattedCategory}/${q.slug}`,
+          lastModified: new Date(q.updatedAt || Date.now()),
+          changeFrequency: "weekly",
+          priority: 0.7,
+        };
+      });
 
     // Query active blogs
     const blogs = await Blog.find({}).select("slug updatedAt").lean();
-    blogPaths = blogs.map((b: any) => ({
-      url: `${baseUrl}/blog/${b.slug}`,
-      lastModified: new Date(b.updatedAt || Date.now()),
-      changeFrequency: "weekly",
-      priority: 0.7,
-    }));
+    blogPaths = blogs
+      .filter((b: any) => b && b.slug)
+      .map((b: any) => ({
+        url: `${baseUrl}/blog/${b.slug}`,
+        lastModified: new Date(b.updatedAt || Date.now()),
+        changeFrequency: "weekly",
+        priority: 0.7,
+      }));
 
     // Query active coding challenges
     const challenges = await Challenge.find({}).select("slug updatedAt").lean();
-    challengePaths = challenges.map((c: any) => ({
-      url: `${baseUrl}/coding/${c.slug}`,
-      lastModified: new Date(c.updatedAt || Date.now()),
-      changeFrequency: "weekly",
-      priority: 0.7,
-    }));
+    challengePaths = challenges
+      .filter((c: any) => c && c.slug)
+      .map((c: any) => ({
+        url: `${baseUrl}/coding/${c.slug}`,
+        lastModified: new Date(c.updatedAt || Date.now()),
+        changeFrequency: "weekly",
+        priority: 0.7,
+      }));
   } catch (error) {
     console.error("Failed to read database entries for dynamic sitemap gen:", error);
   }

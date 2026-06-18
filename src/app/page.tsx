@@ -1,10 +1,16 @@
 import React from "react";
+import type { Metadata } from "next";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
 import CustomCursor from "@/components/shared/CustomCursor";
 import LandingClient from "@/components/landing/LandingClient";
 import { dbConnect } from "@/lib/db";
 import Blog from "@/models/Blog";
+
+export const metadata: Metadata = {
+  title: "InterviewAce AI | AI Interview Prep & ATS Resume Review",
+  description: "Prepare for your dream tech job with real-time AI mock interviews, instant ATS resume scoring, and interactive coding challenges.",
+};
 
 // Force dynamic page generation to verify database reads
 export const revalidate = 0;

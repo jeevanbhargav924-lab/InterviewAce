@@ -1,10 +1,14 @@
-"use client";
-
 import React from "react";
+import type { Metadata } from "next";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
 import CustomCursor from "@/components/shared/CustomCursor";
 import { Compass, ShieldCheck, Mail, Globe, Cpu } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "About Us | InterviewAce AI",
+  description: "Learn more about InterviewAce AI, our mission to help software engineers pass technical interviews, and our creator Jeevan Bhargav.",
+};
 
 export default function AboutPage() {
   return (

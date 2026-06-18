@@ -1,9 +1,13 @@
-"use client";
-
 import React from "react";
+import type { Metadata } from "next";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
 import CustomCursor from "@/components/shared/CustomCursor";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy | InterviewAce AI",
+  description: "Read our Privacy Policy to understand how InterviewAce AI collects, uses, and protects your personal information and session data.",
+};
 
 export default function PrivacyPolicyPage() {
   return (

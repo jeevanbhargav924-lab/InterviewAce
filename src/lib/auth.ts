@@ -5,6 +5,20 @@ import { dbConnect } from "./db";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
 
+if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+  console.warn(
+    "[NextAuth Warning] GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET is missing from the environment. " +
+    "Google Sign-In will fail with an OAuthSignin error when triggered."
+  );
+}
+
+if (process.env.NODE_ENV === "production" && !process.env.NEXTAUTH_URL) {
+  console.warn(
+    "[NextAuth Warning] NEXTAUTH_URL is not set in production. " +
+    "Google OAuth redirects will default to localhost or fail. Please configure NEXTAUTH_URL."
+  );
+}
+
 export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({

@@ -18,7 +18,8 @@ import {
   ChevronDown,
   Layers,
   Code,
-  Crown
+  Crown,
+  X
 } from "lucide-react";
 import AdPlaceholder from "../shared/AdPlaceholder";
 import { FREE_BETA } from "@/lib/config";
@@ -38,6 +39,77 @@ interface LandingClientProps {
 export default function LandingClient({ initialBlogs }: LandingClientProps) {
   const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">("monthly");
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+  // Reviews dynamic state
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [reviewName, setReviewName] = useState("");
+  const [reviewRole, setReviewRole] = useState("");
+  const [reviewStars, setReviewStars] = useState(5);
+  const [reviewQuote, setReviewQuote] = useState("");
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [reviewError, setReviewError] = useState("");
+  const [reviewSuccess, setReviewSuccess] = useState(false);
+
+  React.useEffect(() => {
+    async function fetchReviews() {
+      try {
+        const res = await fetch("/api/reviews");
+        if (res.ok) {
+          const data = await res.json();
+          setReviews(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch reviews:", err);
+      } finally {
+        setReviewsLoading(false);
+      }
+    }
+    fetchReviews();
+  }, []);
+
+  const handleReviewSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reviewName.trim() || !reviewRole.trim() || !reviewQuote.trim()) {
+      setReviewError("All fields are required.");
+      return;
+    }
+    setReviewSubmitting(true);
+    setReviewError("");
+    try {
+      const res = await fetch("/api/reviews", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: reviewName.trim(),
+          role: reviewRole.trim(),
+          stars: reviewStars,
+          quote: reviewQuote.trim()
+        })
+      });
+      if (res.ok) {
+        const newReview = await res.json();
+        setReviews(prev => [newReview, ...prev]);
+        setReviewSuccess(true);
+        setReviewName("");
+        setReviewRole("");
+        setReviewStars(5);
+        setReviewQuote("");
+        setTimeout(() => {
+          setReviewSuccess(false);
+          setShowReviewModal(false);
+        }, 1500);
+      } else {
+        const data = await res.json();
+        setReviewError(data.message || "Failed to submit review.");
+      }
+    } catch (err) {
+      setReviewError("An error occurred. Please try again.");
+    } finally {
+      setReviewSubmitting(false);
+    }
+  };
   
   // States for Interactive Demos
   const [demoTopic, setDemoTopic] = useState("React Developer");
@@ -346,13 +418,13 @@ export default function LandingClient({ initialBlogs }: LandingClientProps) {
                 difficulty: "easy"
               },
               {
-                question: "Explain the Event Loop in Node.js and its phases.",
+                question: "What is the Event Loop in Node.js?",
                 category: "Node.js",
                 slug: "what-is-event-loop",
                 difficulty: "hard"
               },
               {
-                question: "How do you optimize FlatList rendering performance in React Native?",
+                question: "What is FlatList and why should it be used?",
                 category: "React Native",
                 slug: "what-is-flatlist",
                 difficulty: "hard"
@@ -363,24 +435,31 @@ export default function LandingClient({ initialBlogs }: LandingClientProps) {
                 slug: "interface-vs-type",
                 difficulty: "easy"
               }
-            ].map((q, idx) => (
-              <Link
-                key={idx}
-                href={`/questions/${q.category.toLowerCase().replace(/[^a-z0-9]+/g, "-")}/${q.slug}`}
-                className="bg-glass border border-slate-800 hover:border-brand-purple/40 rounded-xl p-5 hover:bg-slate-900/10 flex flex-col justify-between transition-all"
-              >
-                <div>
-                  <span className="inline-block text-[8px] font-black uppercase bg-brand-purple/10 text-brand-purple border border-brand-purple/20 px-2 py-0.5 rounded mb-2">
-                    {q.category}
-                  </span>
-                  <h3 className="text-xs font-bold text-slate-200 leading-snug">{q.question}</h3>
-                </div>
-                <div className="text-[10px] text-brand-cyan font-bold hover:underline mt-4 pt-3 border-t border-slate-800/40 inline-flex items-center space-x-0.5">
-                  <span>Practice Card</span>
-                  <ArrowRight className="h-3 w-3" />
-                </div>
-              </Link>
-            ))}
+            ].map((q, idx) => {
+              const catSlug = q.category.toLowerCase() === "node.js" ? "nodejs" :
+                              q.category.toLowerCase() === "next.js" ? "nextjs" :
+                              q.category.toLowerCase() === "react native" ? "react-native" :
+                              q.category.toLowerCase() === "hr interview" ? "hr-interview" :
+                              q.category.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+              return (
+                <Link
+                  key={idx}
+                  href={`/questions/${catSlug}/${q.slug}`}
+                  className="bg-glass border border-slate-800 hover:border-brand-purple/40 rounded-xl p-5 hover:bg-slate-900/10 flex flex-col justify-between transition-all"
+                >
+                  <div>
+                    <span className="inline-block text-[8px] font-black uppercase bg-brand-purple/10 text-brand-purple border border-brand-purple/20 px-2 py-0.5 rounded mb-2">
+                      {q.category}
+                    </span>
+                    <h3 className="text-xs font-bold text-slate-200 leading-snug">{q.question}</h3>
+                  </div>
+                  <div className="text-[10px] text-brand-cyan font-bold hover:underline mt-4 pt-3 border-t border-slate-800/40 inline-flex items-center space-x-0.5">
+                    <span>Practice Card</span>
+                    <ArrowRight className="h-3 w-3" />
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -642,51 +721,51 @@ export default function LandingClient({ initialBlogs }: LandingClientProps) {
       {/* 10. Testimonials */}
       <section className="py-16 bg-slate-950/20 relative z-10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl font-bold text-white sm:text-3xl">Success Stories</h2>
-            <p className="text-slate-400 text-xs mt-2">Hear from candidates who cleared interview bars using our AI platform.</p>
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
+            <div className="text-left">
+              <h2 className="text-2xl font-bold text-white sm:text-3xl">Success Stories</h2>
+              <p className="text-slate-400 text-xs mt-2">Hear from candidates who cleared interview bars using our AI platform.</p>
+            </div>
+            <button
+              onClick={() => setShowReviewModal(true)}
+              className="mt-4 md:mt-0 rounded-lg bg-gradient-to-r from-brand-purple/80 to-brand-cyan/80 hover:brightness-110 text-xs font-bold text-white px-4 py-2.5 shadow-md active:scale-95 transition-all flex items-center space-x-1.5 cursor-pointer"
+            >
+              <Sparkles className="h-3.5 w-3.5 text-brand-cyan" />
+              <span>Share Your Story</span>
+            </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                quote: "The voice mock interview simulator is incredibly realistic. It felt like talking to a real engineering manager, and the scores helped me pace myself. Cleared my meta loop!",
-                name: "Devon Lane",
-                role: "React Engineer at Vercel",
-                stars: 5
-              },
-              {
-                quote: "Loved the ATS resume keyword matcher. I was sending resumes for 2 months with zero callbacks. Added the missing keywords recommended by the analyzer and got 3 calls in one week.",
-                name: "Kristin Watson",
-                role: "Frontend Developer at Stripe",
-                stars: 5
-              },
-              {
-                quote: "The Next.js and System Design question cards are top tier. Answers are detailed, structured, and easy to memorize. This was my core prep playbook.",
-                name: "Amir Al-Otaibi",
-                role: "Senior Software Engineer at AWS",
-                stars: 5
-              }
-            ].map((t, i) => (
-              <div key={i} className="bg-glass rounded-xl p-6 border border-slate-800 flex flex-col justify-between">
-                <div>
-                  <div className="flex space-x-1 text-amber-400 mb-4">
-                    {[...Array(t.stars)].map((_, idx) => (
-                      <Star key={idx} className="h-3.5 w-3.5 fill-current" />
-                    ))}
-                  </div>
-                  <p className="text-slate-300 text-xs leading-relaxed italic">"{t.quote}"</p>
-                </div>
-                <div className="mt-6 flex items-center space-x-3">
-                  <div className="h-9 w-9 rounded-full bg-slate-800 flex items-center justify-center font-bold text-white text-xs">
-                    {t.name.substring(0, 2)}
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-white">{t.name}</h4>
-                    <p className="text-[10px] text-slate-500">{t.role}</p>
-                  </div>
-                </div>
+            {reviewsLoading ? (
+              <div className="col-span-full py-12 text-center text-slate-500 text-xs animate-pulse">
+                Loading success stories...
               </div>
-            ))}
+            ) : reviews.length === 0 ? (
+              <div className="col-span-full py-12 text-center text-slate-500 text-xs italic">
+                No success stories yet. Be the first to share your experience!
+              </div>
+            ) : (
+              reviews.map((t, i) => (
+                <div key={t._id || i} className="bg-glass rounded-xl p-6 border border-slate-800 flex flex-col justify-between hover:border-brand-purple/20 transition-all duration-300">
+                  <div>
+                    <div className="flex space-x-1 text-amber-400 mb-4">
+                      {[...Array(t.stars)].map((_, idx) => (
+                        <Star key={idx} className="h-3.5 w-3.5 fill-current" />
+                      ))}
+                    </div>
+                    <p className="text-slate-300 text-xs leading-relaxed italic">"{t.quote}"</p>
+                  </div>
+                  <div className="mt-6 flex items-center space-x-3">
+                    <div className="h-9 w-9 rounded-full bg-slate-800 flex items-center justify-center font-bold text-white text-xs">
+                      {(t.name || "").substring(0, 2).toUpperCase()}
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-bold text-white">{t.name}</h4>
+                      <p className="text-[10px] text-slate-500">{t.role}</p>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </section>
@@ -742,6 +821,109 @@ export default function LandingClient({ initialBlogs }: LandingClientProps) {
           </div>
         </div>
       </section>
+
+      {/* Dynamic Review Submission Modal */}
+      {showReviewModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-[#030014]/85 backdrop-blur-sm" onClick={() => setShowReviewModal(false)} />
+          <div className="relative w-full max-w-md bg-slate-900/95 border border-slate-800 rounded-2xl p-6 shadow-[0_0_50px_rgba(139,92,246,0.15)] z-10 text-left backdrop-blur-md">
+            <span className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-brand-purple/35 via-brand-cyan/35 to-brand-purple/35" />
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center space-x-1.5">
+                <Sparkles className="h-4 w-4 text-brand-cyan" />
+                <span>Share Your Review</span>
+              </h3>
+              <button
+                onClick={() => setShowReviewModal(false)}
+                className="text-slate-500 hover:text-white rounded-lg p-1.5 hover:bg-white/5 transition-all cursor-pointer"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            {reviewSuccess ? (
+              <div className="py-10 text-center space-y-3">
+                <div className="h-12 w-12 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center mx-auto text-xl font-bold animate-bounce">
+                  ✓
+                </div>
+                <h4 className="text-sm font-black text-white">Review Submitted!</h4>
+                <p className="text-xs text-slate-400">Thank you for sharing your journey with us.</p>
+              </div>
+            ) : (
+              <form onSubmit={handleReviewSubmit} className="space-y-4">
+                {reviewError && (
+                  <p className="text-xs text-rose-400 bg-rose-950/30 border border-rose-900/30 p-2.5 rounded-lg">{reviewError}</p>
+                )}
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Rating</label>
+                  <div className="flex space-x-2">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => setReviewStars(star)}
+                        className="focus:outline-none transition-transform hover:scale-110 active:scale-95 cursor-pointer"
+                      >
+                        <Star
+                          className={`h-7 w-7 ${
+                            star <= reviewStars
+                              ? "fill-amber-400 text-amber-400"
+                              : "text-slate-700 hover:text-amber-300"
+                          }`}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Full Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={reviewName}
+                    onChange={(e) => setReviewName(e.target.value)}
+                    placeholder="e.g. Kristin Watson"
+                    className="w-full rounded bg-slate-950 border border-slate-800 px-3 py-2 text-xs text-white placeholder-slate-700 focus:border-brand-purple focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Headline / Role</label>
+                  <input
+                    type="text"
+                    required
+                    value={reviewRole}
+                    onChange={(e) => setReviewRole(e.target.value)}
+                    placeholder="e.g. Frontend Developer at Stripe"
+                    className="w-full rounded bg-slate-950 border border-slate-800 px-3 py-2 text-xs text-white placeholder-slate-700 focus:border-brand-cyan focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Your Review</label>
+                  <textarea
+                    required
+                    rows={4}
+                    value={reviewQuote}
+                    onChange={(e) => setReviewQuote(e.target.value)}
+                    placeholder="Tell us how InterviewAce helped you land your role or prepare..."
+                    className="w-full rounded bg-slate-950 border border-slate-800 p-3 text-xs text-white placeholder-slate-700 focus:border-brand-purple focus:outline-none resize-none"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={reviewSubmitting}
+                  className="w-full rounded-lg bg-gradient-to-r from-brand-purple to-brand-cyan hover:brightness-110 py-2.5 text-xs font-bold text-white shadow-xl active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
+                >
+                  {reviewSubmitting ? "Submitting..." : "Submit Review"}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* AD PLACEMENT: FOOTER ADS */}
       <div className="py-6">

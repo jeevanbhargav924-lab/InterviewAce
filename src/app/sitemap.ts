@@ -43,7 +43,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     questionPaths = questions
       .filter((q: any) => q && q.slug)
       .map((q: any) => {
-        const formattedCategory = (q.category || "general").toLowerCase().replace(/[^a-z0-9]+/g, "-");
+        const catLower = (q.category || "general").toLowerCase().trim();
+        const formattedCategory = catLower === "node.js" || catLower === "nodejs" ? "nodejs" :
+                                  catLower === "next.js" || catLower === "nextjs" ? "nextjs" :
+                                  catLower === "react native" || catLower === "react-native" ? "react-native" :
+                                  catLower === "hr interview" || catLower === "hr-interview" ? "hr-interview" :
+                                  catLower.replace(/[^a-z0-9]+/g, "-");
         return {
           url: `${baseUrl}/questions/${formattedCategory}/${q.slug}`,
           lastModified: new Date(q.updatedAt || Date.now()),

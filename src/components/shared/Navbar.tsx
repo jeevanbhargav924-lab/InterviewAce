@@ -207,6 +207,22 @@ export default function Navbar() {
             >
               {theme === "dark" ? <Sun className="h-5 w-5 text-amber-400" /> : <Moon className="h-5 w-5 text-indigo-400" />}
             </button>
+
+            {/* Mobile User Profile Avatar */}
+            {session && (
+              <Link
+                href="/dashboard"
+                className="h-7 w-7 rounded-full bg-gradient-to-tr from-brand-purple to-brand-cyan flex items-center justify-center text-white text-[10px] font-bold uppercase overflow-hidden border border-slate-700"
+              >
+                {session.user?.image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={session.user.image} alt={session.user.name || "User"} className="h-full w-full object-cover" />
+                ) : (
+                  session.user?.name?.substring(0, 2) || "US"
+                )}
+              </Link>
+            )}
+
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="rounded-lg p-2 text-slate-400 hover:bg-white/5 transition-all"
@@ -221,6 +237,22 @@ export default function Navbar() {
       {/* Mobile Menu dropdown */}
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-slate-800 bg-slate-900 dark:bg-[#030014] px-4 py-3 space-y-2">
+          {session && (
+            <div className="flex items-center space-x-3 px-3 py-2 bg-slate-950/40 rounded-xl border border-slate-800/40 mb-3 overflow-hidden">
+              <div className="h-9 w-9 rounded-full bg-gradient-to-tr from-brand-purple to-brand-cyan flex items-center justify-center text-white text-xs font-bold uppercase overflow-hidden shrink-0">
+                {session.user?.image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={session.user.image} alt={session.user.name || "User"} className="h-full w-full object-cover" />
+                ) : (
+                  session.user?.name?.substring(0, 2) || "US"
+                )}
+              </div>
+              <div className="overflow-hidden">
+                <p className="text-xs font-bold text-white truncate">{session.user?.name}</p>
+                <p className="text-[9px] text-slate-500 truncate">{session.user?.email}</p>
+              </div>
+            </div>
+          )}
           {navigation.map((item) => {
             const Icon = item.icon;
             return (

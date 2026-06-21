@@ -58,11 +58,18 @@ export async function GET(req: Request) {
 
     return NextResponse.json({
       categories: filteredCategories,
-      questions: questions.map((q: any) => ({
-        ...q,
-        // Make category safe for slugs
-        categorySlug: q.category.toLowerCase().replace(/[^a-z0-9]+/g, "-")
-      })),
+      questions: questions.map((q: any) => {
+        const catLower = (q.category || "").toLowerCase().trim();
+        const categorySlug = catLower === "node.js" || catLower === "nodejs" ? "nodejs" :
+                             catLower === "next.js" || catLower === "nextjs" ? "nextjs" :
+                             catLower === "react native" || catLower === "react-native" ? "react-native" :
+                             catLower === "hr interview" || catLower === "hr-interview" ? "hr-interview" :
+                             catLower.replace(/[^a-z0-9]+/g, "-");
+        return {
+          ...q,
+          categorySlug
+        };
+      }),
       blogs
     });
   } catch (error: any) {

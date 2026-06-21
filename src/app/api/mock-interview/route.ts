@@ -132,3 +132,24 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: error.message || "Internal Server Error" }, { status: 500 });
   }
 }
+
+export async function GET() {
+  try {
+    await dbConnect();
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    const userId = (session.user as any).id;
+    const interviews = await MockInterview.find({ userId })
+      .sort({ createdAt: -1 })
+      .select("topic scores createdAt")
+      .lean();
+
+    return NextResponse.json(interviews);
+  } catch (error: any) {
+    console.error("Mock Interview GET API error:", error);
+    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+  }
+}

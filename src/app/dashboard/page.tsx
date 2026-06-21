@@ -47,18 +47,17 @@ function UserDashboardContent() {
     async function loadHistory() {
       try {
         // Query user's records from DB
-        const analyticsRes = await fetch("/api/admin/analytics");
-        const analyticsData = await analyticsRes.json();
+        const [interviewsRes, resumesRes] = await Promise.all([
+          fetch("/api/mock-interview"),
+          fetch("/api/resume")
+        ]);
         
-        // Use simulation lists if user has no entries yet
-        setInterviews([
-          { _id: "1", topic: "React Developer (Mid-Level)", scores: { overall: 84 }, createdAt: new Date(Date.now() - 86400000).toISOString() },
-          { _id: "2", topic: "JavaScript Developer (Senior)", scores: { overall: 78 }, createdAt: new Date(Date.now() - 86400000 * 3).toISOString() }
-        ]);
-
-        setResumes([
-          { _id: "1", fileName: "software_engineer_cv.pdf", atsScore: 78, createdAt: new Date(Date.now() - 86400000 * 2).toISOString() }
-        ]);
+        if (interviewsRes.ok && resumesRes.ok) {
+          const interviewsData = await interviewsRes.json();
+          const resumesData = await resumesRes.json();
+          setInterviews(interviewsData);
+          setResumes(resumesData);
+        }
       } catch (err) {
         console.error("Failed to load dashboard logs:", err);
       } finally {
@@ -153,7 +152,7 @@ function UserDashboardContent() {
             </div>
             <div>
               <p className="text-[10px] text-slate-500 font-semibold uppercase">Mock Interviews conducted</p>
-              <h3 className="text-lg font-bold text-white mt-0.5">2 Completed</h3>
+              <h3 className="text-lg font-bold text-white mt-0.5">{interviews.length} Completed</h3>
             </div>
           </div>
 
@@ -164,7 +163,7 @@ function UserDashboardContent() {
             </div>
             <div>
               <p className="text-[10px] text-slate-500 font-semibold uppercase">Resumes Analyzed</p>
-              <h3 className="text-lg font-bold text-white mt-0.5">1 Report</h3>
+              <h3 className="text-lg font-bold text-white mt-0.5">{resumes.length} {resumes.length === 1 ? "Report" : "Reports"}</h3>
             </div>
           </div>
 
@@ -177,7 +176,7 @@ function UserDashboardContent() {
               <div>
                 <p className="text-[10px] text-slate-500 font-semibold uppercase">Account Access</p>
                 <h3 className="text-xs font-bold text-white mt-0.5">
-                  Free Trial (3 Months Active)
+                  {hasPremiumRecord ? "Premium Subscription (Active)" : FREE_BETA ? "Free Beta Access (Unlimited)" : "Free Tier (Basic)"}
                 </h3>
               </div>
             </div>

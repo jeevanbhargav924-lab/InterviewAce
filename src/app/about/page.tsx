@@ -8,6 +8,9 @@ import { Compass, ShieldCheck, Mail, Globe, Cpu } from "lucide-react";
 export const metadata: Metadata = {
   title: "About Us | InterviewAce AI",
   description: "Learn more about InterviewAce AI, our mission to help software engineers pass technical interviews, and our creator Jeevan Bhargav.",
+  alternates: {
+    canonical: "https://www.interviewaceai.online/about"
+  }
 };
 
 export default function AboutPage() {

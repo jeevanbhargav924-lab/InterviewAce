@@ -7,6 +7,7 @@ import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
 import CustomCursor from "@/components/shared/CustomCursor";
 import AdPlaceholder from "@/components/shared/AdPlaceholder";
+import { formatDate } from "@/lib/utils";
 import { FREE_BETA } from "@/lib/config";
 import { LayoutDashboard, Shield, Cpu, FileText, CheckCircle, Crown, Lock, RefreshCw } from "lucide-react";
 
@@ -202,7 +203,7 @@ function UserDashboardContent() {
                     <div key={item._id} className="p-3 bg-slate-950/40 border border-slate-850 rounded-lg flex justify-between items-center">
                       <div>
                         <p className="text-xs font-semibold text-white">{item.topic}</p>
-                        <p className="text-[9px] text-slate-500 mt-0.5">{new Date(item.createdAt).toLocaleDateString()}</p>
+                        <p className="text-[9px] text-slate-500 mt-0.5">{formatDate(item.createdAt)}</p>
                       </div>
                       <div className="text-right">
                         <span className="text-sm font-bold text-brand-cyan">{item.scores.overall}%</span>
@@ -227,7 +228,7 @@ function UserDashboardContent() {
                     <div key={item._id} className="p-3 bg-slate-950/40 border border-slate-850 rounded-lg flex justify-between items-center">
                       <div>
                         <p className="text-xs font-semibold text-white">{item.fileName}</p>
-                        <p className="text-[9px] text-slate-500 mt-0.5">{new Date(item.createdAt).toLocaleDateString()}</p>
+                        <p className="text-[9px] text-slate-500 mt-0.5">{formatDate(item.createdAt)}</p>
                       </div>
                       <div className="text-right">
                         <span className="text-sm font-bold text-brand-purple">{item.atsScore}%</span>

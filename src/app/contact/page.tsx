@@ -5,6 +5,9 @@ import ContactClient from "@/components/contact/ContactClient";
 export const metadata: Metadata = {
   title: "Contact Us | Get in Touch | InterviewAce AI",
   description: "Have questions or feedback about InterviewAce AI? Reach out to our support team and let us know how we can help you prepare for your next interview.",
+  alternates: {
+    canonical: "https://www.interviewaceai.online/contact"
+  }
 };
 
 export default function ContactPage() {

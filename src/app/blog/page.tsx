@@ -15,8 +15,8 @@ export const metadata: Metadata = {
   }
 };
 
-// Force dynamic execution for fresh reads in SSR
-export const revalidate = 0;
+// Set ISR static cache revalidation to 1 hour (3600 seconds)
+export const revalidate = 3600;
 
 export default async function BlogFeedPage() {
   let initialBlogs: any[] = [];

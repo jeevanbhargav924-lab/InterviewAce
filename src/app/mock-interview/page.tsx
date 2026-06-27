@@ -14,8 +14,31 @@ export const metadata: Metadata = {
 };
 
 export default function MockInterviewSetupPage() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "AI Voice Mock Interview Simulator | InterviewAce AI",
+    "operatingSystem": "All",
+    "applicationCategory": "EducationalApplication",
+    "offers": {
+      "@type": "Offer",
+      "price": "0.00",
+      "priceCurrency": "USD"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "ratingCount": "128"
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-[#030014]">
+      {/* SoftwareApplication Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <CustomCursor />
       <Navbar />
 

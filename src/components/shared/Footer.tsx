@@ -68,6 +68,11 @@ export default function Footer() {
                   Disclaimer
                 </Link>
               </li>
+              <li>
+                <Link href="/editorial-policy" className="hover:text-white transition-colors">
+                  Editorial Policy
+                </Link>
+              </li>
             </ul>
           </div>
 

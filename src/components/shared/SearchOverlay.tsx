@@ -165,14 +165,14 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
         {/* Result Area */}
         <div className="flex-1 overflow-y-auto p-4 space-y-6">
           
-          {/* Default / Recent Searches */}
+          {/* Default / Recent Searches & Popular Topics */}
           {!query && (
-            <div className="space-y-4">
-              {recentSearches.length > 0 ? (
+            <div className="space-y-6">
+              {recentSearches.length > 0 && (
                 <div>
                   <div className="flex items-center justify-between text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-2">
                     <span>Recent Searches</span>
-                    <button onClick={clearAllRecent} className="hover:text-red-400 font-bold lowercase">
+                    <button onClick={clearAllRecent} className="hover:text-red-400 font-bold lowercase focus:outline-none">
                       clear all
                     </button>
                   </div>
@@ -197,11 +197,36 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                     ))}
                   </div>
                 </div>
-              ) : (
-                <div className="py-8 text-center text-slate-500 space-y-2">
-                  <Sparkles className="h-7 w-7 text-brand-purple/40 mx-auto animate-pulse" />
+              )}
+
+              {/* Popular Topics */}
+              <div>
+                <h4 className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-2.5">Popular Topics</h4>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    "React Hook",
+                    "Event Loop",
+                    "FlatList",
+                    "SSR vs SSG",
+                    "TypeScript Generic",
+                    "STAR method",
+                    "System Design"
+                  ].map((topic) => (
+                    <button
+                      key={topic}
+                      onClick={() => setQuery(topic)}
+                      className="px-3 py-1.5 rounded-lg bg-slate-950/40 hover:bg-brand-purple/15 border border-slate-800 text-[11px] text-slate-300 hover:text-white hover:border-brand-purple/40 transition-all cursor-pointer font-semibold focus:outline-none focus:ring-1 focus:ring-brand-purple"
+                    >
+                      {topic}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {recentSearches.length === 0 && (
+                <div className="py-6 text-center text-slate-500 space-y-2 border-t border-slate-800/40 pt-6">
+                  <Sparkles className="h-6 w-6 text-brand-purple/40 mx-auto animate-pulse" />
                   <p className="text-xs">Type your target keywords to look up preparation materials</p>
-                  <p className="text-[10px] text-slate-600">Try searching "React Hook", "Event Loop", or "FlatList"</p>
                 </div>
               )}
             </div>

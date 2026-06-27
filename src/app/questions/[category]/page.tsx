@@ -8,6 +8,9 @@ import Question from "@/models/Question";
 import Blog from "@/models/Blog";
 import { Metadata } from "next";
 import { Compass, BookOpen, ChevronRight, HelpCircle, FileText } from "lucide-react";
+import QuestionSearchList from "@/components/questions/QuestionSearchList";
+
+export const revalidate = 3600;
 
 interface CategoryPageProps {
   params: Promise<{ category: string }>;
@@ -168,54 +171,12 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Left Main questions grid */}
           <div className="lg:col-span-3 space-y-6">
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider mb-4 flex items-center space-x-2">
+            <div className="flex items-center space-x-2 mb-4 pb-2 border-b border-slate-800/40">
               <FileText className="h-4.5 w-4.5 text-brand-purple" />
-              <span>Question Cards ({questions.length})</span>
-            </h2>
+              <h2 className="text-sm font-bold text-white uppercase tracking-wider">Question Cards</h2>
+            </div>
 
-            {questions.length === 0 ? (
-              <div className="bg-glass rounded-xl p-10 text-center border border-slate-800 text-slate-500 text-xs">
-                No question sheets seeded for {info.name} yet. Check back soon.
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {questions.map((q: any, idx) => (
-                  <Link
-                    key={q._id}
-                    href={`/questions/${catKey}/${(q.slug && q.slug !== "undefined") ? q.slug : q._id}`}
-                    className="bg-glass border border-slate-800/80 hover:border-slate-700 p-5 rounded-xl flex flex-col justify-between hover:bg-slate-900/10 transition-all duration-200 text-left group"
-                  >
-                    <div>
-                      <div className="flex justify-between items-center mb-2.5">
-                        <span className="text-[10px] text-slate-500 font-mono font-medium">Card #{idx + 1}</span>
-                        <span className={`rounded-full px-2 py-0.5 text-[8px] font-black uppercase border ${
-                          q.difficulty === "easy" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" :
-                          q.difficulty === "medium" ? "bg-amber-500/10 text-amber-400 border-amber-500/20" :
-                          "bg-rose-500/10 text-rose-400 border-rose-500/20"
-                        }`}>
-                          {q.difficulty}
-                        </span>
-                      </div>
-                      <h3 className="text-xs font-bold text-slate-200 leading-snug group-hover:text-white transition-colors">{q.question}</h3>
-                    </div>
-
-                    <div className="flex justify-between items-center mt-4 pt-3 border-t border-slate-800/40">
-                      <div className="flex gap-1.5 overflow-hidden">
-                        {q.tags.slice(0, 2).map((tag: string) => (
-                          <span key={tag} className="text-[8px] text-slate-500 bg-slate-900 px-2 py-0.5 rounded">
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                      <span className="text-[10px] text-brand-cyan hover:underline font-bold inline-flex items-center space-x-0.5">
-                        <span>Read card</span>
-                        <ChevronRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
-                      </span>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            )}
+            <QuestionSearchList initialQuestions={questions} catKey={catKey} />
 
             {/* Category FAQs */}
             {info.faqs.length > 0 && (

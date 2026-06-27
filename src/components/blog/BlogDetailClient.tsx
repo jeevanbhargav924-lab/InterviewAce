@@ -6,9 +6,25 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { ChevronLeft, Eye, MessageSquare, Calendar, User, Send } from "lucide-react";
+import { 
+  ChevronLeft, 
+  Eye, 
+  MessageSquare, 
+  Calendar, 
+  User, 
+  Send, 
+  Clock, 
+  Compass, 
+  Cpu, 
+  FileText, 
+  ChevronRight,
+  BookOpen,
+  Terminal
+} from "lucide-react";
 import AdPlaceholder from "../shared/AdPlaceholder";
 import { formatDate } from "@/lib/utils";
+import ShareButtons from "../shared/ShareButtons";
+import FeedbackVoting from "../shared/FeedbackVoting";
 
 interface Comment {
   _id: string;
@@ -37,11 +53,34 @@ interface BlogArticle {
   createdAt: string;
 }
 
-interface BlogDetailClientProps {
-  initialBlog: BlogArticle;
+interface RelatedBlog {
+  _id: string;
+  title: string;
+  slug: string;
+  summary: string;
+  coverImage: string;
+  category: string;
+  createdAt: string;
 }
 
-export default function BlogDetailClient({ initialBlog }: BlogDetailClientProps) {
+interface BlogDetailClientProps {
+  initialBlog: BlogArticle;
+  relatedBlogs?: RelatedBlog[];
+}
+
+const getHeadingId = (children: React.ReactNode): string => {
+  let text = "";
+  React.Children.forEach(children, (child) => {
+    if (typeof child === "string" || typeof child === "number") {
+      text += child;
+    } else if (React.isValidElement(child) && (child as any).props?.children) {
+      text += getHeadingId((child as any).props.children);
+    }
+  });
+  return text.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-");
+};
+
+export default function BlogDetailClient({ initialBlog, relatedBlogs = [] }: BlogDetailClientProps) {
   const router = useRouter();
   const { data: session } = useSession();
   const [blog, setBlog] = useState<BlogArticle>(initialBlog);
@@ -80,12 +119,33 @@ export default function BlogDetailClient({ initialBlog }: BlogDetailClientProps)
     }
   };
 
+  // Estimate Reading Time
+  const wordCount = blog.content.split(/\s+/).length;
+  const readingTime = Math.max(1, Math.round(wordCount / 220));
+
+  // Extract H2 and H3 headers for Table of Contents
+  const generateToc = (content: string) => {
+    const lines = content.split("\n");
+    const headers: Array<{ text: string; id: string; level: number }> = [];
+    lines.forEach((line) => {
+      const match = line.match(/^(#{2,3})\s+(.*)$/);
+      if (match) {
+        const level = match[1].length;
+        const text = match[2].trim().replace(/[*_`]/g, "");
+        const id = text.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+        headers.push({ text, id, level });
+      }
+    });
+    return headers;
+  };
+  const tocHeaders = generateToc(blog.content);
+
   return (
     <>
       {/* Back navigation */}
       <button
         onClick={() => router.push("/blog")}
-        className="text-xs text-slate-500 hover:text-white flex items-center space-x-1 mb-6 text-left"
+        className="text-xs text-slate-500 hover:text-white flex items-center space-x-1 mb-6 text-left focus:outline-none"
       >
         <ChevronLeft className="h-4 w-4" />
         <span>Back to feeds</span>
@@ -108,7 +168,7 @@ export default function BlogDetailClient({ initialBlog }: BlogDetailClientProps)
           <div>
             <h1 className="text-xl sm:text-2xl font-black text-white leading-snug">{blog.title}</h1>
             
-            <div className="flex items-center space-x-4 text-[10px] text-slate-500 mt-3 pb-4 border-b border-slate-800/80">
+            <div className="flex flex-wrap gap-y-2 items-center space-x-4 text-[10px] text-slate-500 mt-3 pb-4 border-b border-slate-800/80">
               <span className="flex items-center space-x-1">
                 <User className="h-3.5 w-3.5" />
                 <span>By {blog.author.name}</span>
@@ -116,6 +176,10 @@ export default function BlogDetailClient({ initialBlog }: BlogDetailClientProps)
               <span className="flex items-center space-x-1">
                 <Calendar className="h-3.5 w-3.5" />
                 <span>{formatDate(blog.createdAt)}</span>
+              </span>
+              <span className="flex items-center space-x-1">
+                <Clock className="h-3.5 w-3.5" />
+                <span>{readingTime} min read</span>
               </span>
               <span className="flex items-center space-x-1">
                 <Eye className="h-3.5 w-3.5" />
@@ -129,9 +193,27 @@ export default function BlogDetailClient({ initialBlog }: BlogDetailClientProps)
 
           {/* MDX Content Markdown container */}
           <div className="prose prose-invert prose-xs text-xs text-slate-300 leading-relaxed font-normal whitespace-pre-wrap">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            <ReactMarkdown 
+              remarkPlugins={[remarkGfm]}
+              components={{
+                h2: ({ children, ...props }: any) => {
+                  const id = getHeadingId(children);
+                  return <h2 id={id} className="text-base font-bold text-white mt-8 mb-3 scroll-mt-24 border-b border-slate-800/80 pb-2" {...props}>{children}</h2>;
+                },
+                h3: ({ children, ...props }: any) => {
+                  const id = getHeadingId(children);
+                  return <h3 id={id} className="text-sm font-bold text-white mt-6 mb-2 scroll-mt-24" {...props}>{children}</h3>;
+                }
+              }}
+            >
               {blog.content}
             </ReactMarkdown>
+          </div>
+
+          {/* Interactive share and feedback loops */}
+          <div className="space-y-4 mt-8">
+            <ShareButtons title={blog.title} />
+            <FeedbackVoting slug={blog.slug} />
           </div>
 
           {/* Author Profile card */}
@@ -219,6 +301,104 @@ export default function BlogDetailClient({ initialBlog }: BlogDetailClientProps)
 
         {/* Right sidebar */}
         <div className="space-y-6">
+          {/* Table of Contents */}
+          {tocHeaders.length > 0 && (
+            <div className="bg-glass border border-slate-800 rounded-xl p-5 relative overflow-hidden backdrop-blur-md sticky top-20 text-left">
+              <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center space-x-2 mb-3 pb-2 border-b border-slate-800/50">
+                <BookOpen className="h-4 w-4 text-brand-purple" />
+                <span>Table of Contents</span>
+              </h3>
+              <nav className="space-y-2">
+                {tocHeaders.map((header, index) => (
+                  <a
+                    key={index}
+                    href={`#${header.id}`}
+                    className={`block text-[11px] text-slate-450 hover:text-white transition-colors leading-relaxed ${
+                      header.level === 3 ? "pl-3 text-[10.5px]" : "font-semibold"
+                    }`}
+                  >
+                    {header.text}
+                  </a>
+                ))}
+              </nav>
+            </div>
+          )}
+
+          {/* Quick promotion CTA widget */}
+          <div className="bg-gradient-to-tr from-brand-purple/20 via-slate-900 to-brand-cyan/20 border border-brand-purple/30 rounded-xl p-5 text-left relative overflow-hidden">
+            <span className="absolute -right-6 -bottom-6 h-16 w-16 bg-brand-cyan/10 rounded-full blur-xl" />
+            <h3 className="text-xs font-black text-white uppercase tracking-wider mb-2">Accelerate Your Prep</h3>
+            <p className="text-[10px] text-slate-400 leading-relaxed font-normal mb-4">
+              Get instant feedbacks, dynamic voice simulations, and keyword scorecard matchers.
+            </p>
+            <div className="space-y-2.5">
+              <Link
+                href="/mock-interview"
+                className="flex items-center justify-between p-2.5 rounded-lg bg-slate-950/60 border border-slate-850 hover:border-brand-cyan/50 hover:bg-slate-900/60 transition-all text-xs text-white group"
+              >
+                <div className="flex items-center space-x-2">
+                  <Cpu className="h-3.5 w-3.5 text-brand-cyan" />
+                  <span>AI Mock Interview</span>
+                </div>
+                <ChevronRight className="h-3.5 w-3.5 text-slate-500 group-hover:text-white transition-colors" />
+              </Link>
+
+              <Link
+                href="/resume-analyzer"
+                className="flex items-center justify-between p-2.5 rounded-lg bg-slate-950/60 border border-slate-850 hover:border-brand-purple/50 hover:bg-slate-900/60 transition-all text-xs text-white group"
+              >
+                <div className="flex items-center space-x-2">
+                  <FileText className="h-3.5 w-3.5 text-brand-purple" />
+                  <span>ATS Resume Scorer</span>
+                </div>
+                <ChevronRight className="h-3.5 w-3.5 text-slate-500 group-hover:text-white transition-colors" />
+              </Link>
+
+              <Link
+                href="/coding"
+                className="flex items-center justify-between p-2.5 rounded-lg bg-slate-950/60 border border-slate-850 hover:border-brand-cyan/50 hover:bg-slate-900/60 transition-all text-xs text-white group"
+              >
+                <div className="flex items-center space-x-2">
+                  <Terminal className="h-3.5 w-3.5 text-brand-cyan" />
+                  <span>Algorithmic Sandbox</span>
+                </div>
+                <ChevronRight className="h-3.5 w-3.5 text-slate-500 group-hover:text-white transition-colors" />
+              </Link>
+            </div>
+          </div>
+
+          {/* Related Articles */}
+          {relatedBlogs.length > 0 && (
+            <div className="bg-glass border border-slate-800 rounded-xl p-5 text-left relative overflow-hidden backdrop-blur-md">
+              <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center space-x-2 mb-3 pb-2 border-b border-slate-800/50">
+                <Compass className="h-4 w-4 text-brand-cyan" />
+                <span>Related Insights</span>
+              </h3>
+              <div className="space-y-4">
+                {relatedBlogs.map((rBlog) => (
+                  <Link
+                    key={rBlog._id}
+                    href={`/blog/${rBlog.slug}`}
+                    className="block group"
+                  >
+                    <div className="flex space-x-2.5">
+                      <div className="h-10 w-14 rounded bg-slate-900 border border-slate-850 overflow-hidden shrink-0">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={rBlog.coverImage} alt={rBlog.title} className="h-full w-full object-cover group-hover:scale-105 transition-transform" />
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="text-[11.5px] font-bold text-slate-300 group-hover:text-brand-cyan transition-colors leading-snug line-clamp-2">
+                          {rBlog.title}
+                        </h4>
+                        <span className="text-[9px] text-slate-500">{formatDate(rBlog.createdAt)}</span>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* AD PLACEMENT: SIDEBAR ADS */}
           <AdPlaceholder position="sidebar" />
         </div>

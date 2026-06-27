@@ -7,9 +7,11 @@ import CustomCursor from "@/components/shared/CustomCursor";
 import { dbConnect } from "@/lib/db";
 import Question from "@/models/Question";
 import { Metadata } from "next";
-import { ChevronRight, Bookmark, ArrowLeft, Star, Compass, Terminal, HelpCircle } from "lucide-react";
+import { ChevronRight, Bookmark, ArrowLeft, Star, Compass, Terminal, HelpCircle, Cpu, FileText, Clock } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import ShareButtons from "@/components/shared/ShareButtons";
+import FeedbackVoting from "@/components/shared/FeedbackVoting";
 
 interface QuestionPageProps {
   params: Promise<{ category: string; slug: string }>;
@@ -86,6 +88,9 @@ export default async function QuestionDetailPage({ params }: QuestionPageProps) 
     notFound();
   }
 
+  const wordCount = (qDoc.answer || "").split(/\s+/).length + (qDoc.example || "").split(/\s+/).length;
+  const readingTime = Math.max(1, Math.round(wordCount / 220));
+
   // capitalize category label
   const catLabel = qDoc.category;
 
@@ -139,6 +144,27 @@ export default async function QuestionDetailPage({ params }: QuestionPageProps) 
     ]
   };
 
+  // JSON-LD QAPage Schema for search engine integration
+  const qaSchema = {
+    "@context": "https://schema.org",
+    "@type": "QAPage",
+    "mainEntity": {
+      "@type": "Question",
+      "name": qDoc.question,
+      "text": qDoc.question,
+      "answerCount": 1,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": qDoc.answer,
+        "url": `https://www.interviewaceai.online/questions/${category}/${slug}`,
+        "author": {
+          "@type": "Person",
+          "name": "Jeevan Bhargav"
+        }
+      }
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-[#030014]">
       {/* Schema Markups */}
@@ -149,6 +175,10 @@ export default async function QuestionDetailPage({ params }: QuestionPageProps) 
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(qaSchema) }}
       />
       
       <CustomCursor />
@@ -182,10 +212,16 @@ export default async function QuestionDetailPage({ params }: QuestionPageProps) 
 
               {/* Tag header */}
               <div className="flex justify-between items-center mb-4">
-                <span className="inline-flex items-center space-x-1 text-[9px] font-black uppercase tracking-wider text-brand-purple">
-                  <Bookmark className="h-3.5 w-3.5" />
-                  <span>{catLabel} card review</span>
-                </span>
+                <div className="flex items-center space-x-3">
+                  <span className="inline-flex items-center space-x-1 text-[9px] font-black uppercase tracking-wider text-brand-purple">
+                    <Bookmark className="h-3.5 w-3.5" />
+                    <span>{catLabel} card review</span>
+                  </span>
+                  <span className="flex items-center space-x-1 text-[9px] text-slate-500 font-medium">
+                    <Clock className="h-3 w-3" />
+                    <span>{readingTime} min read</span>
+                  </span>
+                </div>
                 <span className={`rounded-full px-2.5 py-0.5 text-[8px] font-black uppercase border ${
                   qDoc.difficulty === "easy" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" :
                   qDoc.difficulty === "medium" ? "bg-amber-500/10 text-amber-400 border-amber-500/20" :
@@ -222,6 +258,12 @@ export default async function QuestionDetailPage({ params }: QuestionPageProps) 
                 </div>
               )}
             </article>
+
+            {/* Interactive share and feedback loops */}
+            <div className="space-y-4">
+              <ShareButtons title={qDoc.question} />
+              <FeedbackVoting slug={slug} />
+            </div>
 
             {/* Questions FAQs */}
             {qDoc.faqs && qDoc.faqs.length > 0 && (
@@ -269,6 +311,49 @@ export default async function QuestionDetailPage({ params }: QuestionPageProps) 
                   ))}
                 </div>
               )}
+            </div>
+
+            {/* Quick promotion CTA widget */}
+            <div className="bg-gradient-to-tr from-brand-purple/20 via-slate-900 to-brand-cyan/20 border border-brand-purple/35 rounded-xl p-5 text-left relative overflow-hidden">
+              <span className="absolute -right-6 -bottom-6 h-16 w-16 bg-brand-cyan/10 rounded-full blur-xl" />
+              <h3 className="text-xs font-black text-white uppercase tracking-wider mb-2">Accelerate Your Prep</h3>
+              <p className="text-[10px] text-slate-400 leading-relaxed font-normal mb-4">
+                Get instant feedbacks, dynamic voice simulations, and keyword scorecard matchers.
+              </p>
+              <div className="space-y-2.5">
+                <Link
+                  href="/mock-interview"
+                  className="flex items-center justify-between p-2.5 rounded-lg bg-slate-950/60 border border-slate-850 hover:border-brand-cyan/50 hover:bg-slate-900/60 transition-all text-xs text-white group"
+                >
+                  <div className="flex items-center space-x-2">
+                    <Cpu className="h-3.5 w-3.5 text-brand-cyan" />
+                    <span>AI Mock Interview</span>
+                  </div>
+                  <ChevronRight className="h-3.5 w-3.5 text-slate-500 group-hover:text-white transition-colors" />
+                </Link>
+
+                <Link
+                  href="/resume-analyzer"
+                  className="flex items-center justify-between p-2.5 rounded-lg bg-slate-950/60 border border-slate-850 hover:border-brand-purple/50 hover:bg-slate-900/60 transition-all text-xs text-white group"
+                >
+                  <div className="flex items-center space-x-2">
+                    <FileText className="h-3.5 w-3.5 text-brand-purple" />
+                    <span>ATS Resume Scorer</span>
+                  </div>
+                  <ChevronRight className="h-3.5 w-3.5 text-slate-500 group-hover:text-white transition-colors" />
+                </Link>
+
+                <Link
+                  href="/coding"
+                  className="flex items-center justify-between p-2.5 rounded-lg bg-slate-950/60 border border-slate-850 hover:border-brand-cyan/50 hover:bg-slate-900/60 transition-all text-xs text-white group"
+                >
+                  <div className="flex items-center space-x-2">
+                    <Terminal className="h-3.5 w-3.5 text-brand-cyan" />
+                    <span>Algorithmic Sandbox</span>
+                  </div>
+                  <ChevronRight className="h-3.5 w-3.5 text-slate-500 group-hover:text-white transition-colors" />
+                </Link>
+              </div>
             </div>
 
             {/* Quick trust signal */}

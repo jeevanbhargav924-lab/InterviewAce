@@ -1,9 +1,16 @@
-"use client";
-
 import React from "react";
+import type { Metadata } from "next";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
 import CustomCursor from "@/components/shared/CustomCursor";
+
+export const metadata: Metadata = {
+  title: "Terms and Conditions | InterviewAce AI",
+  description: "Read our Terms and Conditions carefully before using InterviewAce AI. Learn about user rights, software licenses, and disclaimer specifications.",
+  alternates: {
+    canonical: "https://www.interviewaceai.online/terms-and-conditions"
+  }
+};
 
 export default function TermsAndConditionsPage() {
   return (

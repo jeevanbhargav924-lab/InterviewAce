@@ -35,14 +35,15 @@ export async function generateMetadata({ params }: BlogPageProps): Promise<Metad
   }
 }
 
-// Force dynamic execution for fresh reads in SSR
-export const revalidate = 0;
+// Set ISR static cache revalidation to 1 hour (3600 seconds)
+export const revalidate = 3600;
 
 export default async function BlogDetailPage({ params }: BlogPageProps) {
   const resolvedParams = await params;
   const { slug } = resolvedParams;
 
   let blogData: any = null;
+  let relatedBlogs: any[] = [];
 
   try {
     await dbConnect();
@@ -78,6 +79,25 @@ export default async function BlogDetailPage({ params }: BlogPageProps) {
         })),
         createdAt: rawBlog.createdAt ? new Date(rawBlog.createdAt).toISOString() : new Date().toISOString()
       };
+
+      // Fetch related blogs from the same category
+      const rawRelated = await Blog.find({
+        category: rawBlog.category,
+        _id: { $ne: rawBlog._id }
+      })
+        .select("title slug summary coverImage category createdAt")
+        .limit(3)
+        .lean();
+
+      relatedBlogs = rawRelated.map((b: any) => ({
+        _id: b._id.toString(),
+        title: b.title,
+        slug: b.slug,
+        summary: b.summary,
+        coverImage: b.coverImage,
+        category: b.category,
+        createdAt: b.createdAt ? new Date(b.createdAt).toISOString() : new Date().toISOString()
+      }));
     }
   } catch (error) {
     console.error("Database connection failed in Blog Detail Server fetch.", error);
@@ -126,7 +146,7 @@ export default async function BlogDetailPage({ params }: BlogPageProps) {
       <Navbar />
 
       <main className="flex-grow mx-auto max-w-5xl w-full px-4 py-8 sm:px-6 relative z-10">
-        <BlogDetailClient initialBlog={blogData} />
+        <BlogDetailClient initialBlog={blogData} relatedBlogs={relatedBlogs} />
       </main>
 
       <Footer />

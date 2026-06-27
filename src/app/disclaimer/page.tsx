@@ -1,9 +1,16 @@
-"use client";
-
 import React from "react";
+import type { Metadata } from "next";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
 import CustomCursor from "@/components/shared/CustomCursor";
+
+export const metadata: Metadata = {
+  title: "Disclaimer | InterviewAce AI",
+  description: "Read our Disclaimer to understand the educational scope of InterviewAce AI, content accuracy, external links, and interview outcome policies.",
+  alternates: {
+    canonical: "https://www.interviewaceai.online/disclaimer"
+  }
+};
 
 export default function DisclaimerPage() {
   return (

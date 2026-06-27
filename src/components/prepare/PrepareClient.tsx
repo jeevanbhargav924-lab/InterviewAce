@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { Compass, AlertCircle, ChevronDown } from "lucide-react";
+import { Compass, AlertCircle, ChevronDown, ExternalLink } from "lucide-react";
 import AdPlaceholder from "../shared/AdPlaceholder";
 
 interface QuestionItem {
@@ -12,6 +13,7 @@ interface QuestionItem {
   category: string;
   difficulty: "easy" | "medium" | "hard";
   tags: string[];
+  slug: string;
 }
 
 export default function PrepareClient() {
@@ -147,21 +149,39 @@ export default function PrepareClient() {
                   {q.question}
                 </h3>
 
-                <div>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-slate-800/60 pt-4 mt-4">
                   <button
                     onClick={() => toggleAnswer(q._id)}
-                    className="flex items-center space-x-1 text-xs text-brand-cyan hover:text-brand-purple font-semibold focus:outline-none cursor-pointer"
+                    className="flex items-center space-x-1 text-xs text-slate-300 hover:text-white font-semibold focus:outline-none cursor-pointer"
                   >
                     <span>{visibleAnswers[q._id] ? "Hide Answer" : "Show Best Answer"}</span>
                     <ChevronDown className={`h-4 w-4 transition-transform ${visibleAnswers[q._id] ? "rotate-180" : ""}`} />
                   </button>
 
-                  {visibleAnswers[q._id] && (
-                    <div className="mt-4 p-4 rounded-lg bg-slate-950 border border-slate-800/80 text-xs text-slate-300 leading-relaxed font-normal animate-fadeIn">
-                      {q.answer}
-                    </div>
-                  )}
+                  {(() => {
+                    const catLower = (q.category || "").toLowerCase().trim();
+                    const categorySlug = catLower === "node.js" || catLower === "nodejs" ? "nodejs" :
+                                         catLower === "next.js" || catLower === "nextjs" ? "nextjs" :
+                                         catLower === "react-native" || catLower === "react native" ? "react-native" :
+                                         catLower === "hr interview" || catLower === "hr-interview" || catLower === "hr" || catLower === "behavioral" ? "hr-interview" :
+                                         catLower.replace(/[^a-z0-9]+/g, "-");
+                    return (
+                      <Link
+                        href={`/questions/${categorySlug}/${q.slug || q._id}`}
+                        className="flex items-center space-x-1 text-xs text-brand-cyan hover:text-brand-purple font-semibold transition-colors"
+                      >
+                        <span>Deep Dive & Examples</span>
+                        <ExternalLink className="h-3.5 w-3.5" />
+                      </Link>
+                    );
+                  })()}
                 </div>
+
+                {visibleAnswers[q._id] && (
+                  <div className="mt-4 p-4 rounded-lg bg-slate-950 border border-slate-800/80 text-xs text-slate-300 leading-relaxed font-normal animate-fadeIn">
+                    {q.answer}
+                  </div>
+                )}
               </div>
             ))
           )}

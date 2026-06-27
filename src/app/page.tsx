@@ -12,8 +12,8 @@ export const metadata: Metadata = {
   description: "Prepare for your dream tech job with real-time AI mock interviews, instant ATS resume scoring, and interactive coding challenges.",
 };
 
-// Force dynamic page generation to verify database reads
-export const revalidate = 0;
+// Set ISR static cache revalidation to 1 hour (3600 seconds)
+export const revalidate = 3600;
 
 export default async function Home() {
   let blogs: any[] = [];

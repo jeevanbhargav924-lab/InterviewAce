@@ -94,7 +94,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
         />
       </head>
-      <body className="min-h-full flex flex-col bg-[#030014] text-slate-100 dark:bg-[#030014] dark:text-slate-100 transition-colors duration-300">
+      <body className="min-h-full flex flex-col bg-[#030014] text-slate-100 dark:bg-[#030014] dark:text-slate-100 transition-colors duration-300" suppressHydrationWarning>
         {process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID && (
           <Script
             src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}`}

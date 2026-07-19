@@ -36,7 +36,6 @@ export default async function Home() {
   } catch (error) {
     console.error("Database connection failed in Landing page server fetch. Falling back to static values.", error);
   }
-  console.log("ffffffffffffffffff")
   // Fallback blogs if database is not seeded/reachable
   const displayBlogs = blogs.length > 0 ? blogs : [
     {

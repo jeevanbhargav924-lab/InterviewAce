@@ -39,6 +39,14 @@ export async function dbConnect() {
 
     cached.promise = mongoose.connect(MONGODB_URI, opts)
       .then((mongooseInstance) => {
+        // Trigger seeding in the background so it doesn't block the request path
+        import("./seeder")
+          .then(({ ensureSeedData }) => {
+            ensureSeedData();
+          })
+          .catch((err) => {
+            console.error("[MongoDB] Failed to import seeder:", err);
+          });
         return mongooseInstance;
       })
       .catch(async (err) => {

@@ -109,9 +109,17 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
                            catKey === "nodejs" ? "Node.js" :
                            info.name;
 
-    questions = await Question.find({
+    const rawQuestions = await Question.find({
       category: { $regex: new RegExp(`^${mappedCategory}$`, "i") }
     }).select("question slug difficulty tags").lean();
+
+    questions = rawQuestions.map((q: any) => ({
+      _id: q._id.toString(),
+      question: q.question,
+      slug: q.slug,
+      difficulty: q.difficulty,
+      tags: q.tags || []
+    }));
 
     // Query category blogs
     blogs = await Blog.find({

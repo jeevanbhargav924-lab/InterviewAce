@@ -25,7 +25,7 @@ export default function PrepareClient() {
   const [visibleAnswers, setVisibleAnswers] = useState<Record<string, boolean>>({});
 
   const categoriesList = [
-    "React", "JavaScript", "TypeScript", "React Native", "Next.js", "Node.js", "MongoDB", "HR", "Behavioral"
+    "React", "JavaScript", "TypeScript", "React Native", "Next.js", "Node.js", "HR Interview"
   ];
 
   useEffect(() => {

@@ -12,6 +12,7 @@ export default function robots(): MetadataRoute.Robots {
         "/dashboard/",
         "/api/",
         "/_next/",
+        "/mock-interview/",
       ],
     },
     sitemap: `${baseUrl}/sitemap.xml`,

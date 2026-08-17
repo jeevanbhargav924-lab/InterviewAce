@@ -6,6 +6,7 @@ import CustomCursor from "@/components/shared/CustomCursor";
 import LandingClient from "@/components/landing/LandingClient";
 import { dbConnect } from "@/lib/db";
 import Blog from "@/models/Blog";
+import Question from "@/models/Question";
 
 export const metadata: Metadata = {
   title: "InterviewAce AI | AI Interview Prep & ATS Resume Review",
@@ -17,9 +18,38 @@ export const revalidate = 3600;
 
 export default async function Home() {
   let blogs: any[] = [];
+  let totalQuestions = 22;
+  let totalBlogs = 17;
+  const categoryCounts: Record<string, number> = {
+    "react": 4,
+    "javascript": 4,
+    "typescript": 3,
+    "react-native": 2,
+    "nextjs": 3,
+    "nodejs": 3,
+    "hr-interview": 3
+  };
 
   try {
     await dbConnect();
+    
+    // Fetch total database counts
+    totalBlogs = await Blog.countDocuments();
+    totalQuestions = await Question.countDocuments();
+
+    // Fetch specific category counts
+    const categoriesList = ["React", "JavaScript", "TypeScript", "React Native", "Next.js", "Node.js", "HR Interview"];
+    for (const cat of categoriesList) {
+      const dbCategory = cat === "React Native" ? "React Native" :
+                         cat === "Next.js" ? "Next.js" :
+                         cat === "Node.js" ? "Node.js" :
+                         cat === "HR Interview" ? "HR Interview" :
+                         cat;
+      categoryCounts[cat.toLowerCase().replace(/[^a-z0-9]+/g, "-")] = await Question.countDocuments({
+        category: { $regex: new RegExp(`^${dbCategory}$`, "i") }
+      });
+    }
+
     const rawBlogs = await Blog.find({})
       .sort({ createdAt: -1 })
       .limit(3)
@@ -71,7 +101,12 @@ export default async function Home() {
 
       {/* Primary landing component */}
       <main className="flex-grow">
-        <LandingClient initialBlogs={displayBlogs} />
+        <LandingClient 
+          initialBlogs={displayBlogs} 
+          totalQuestions={totalQuestions} 
+          totalBlogs={totalBlogs} 
+          categoryCounts={categoryCounts}
+        />
       </main>
 
       {/* Bottom Footer block */}
